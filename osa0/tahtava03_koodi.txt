@@ -1,0 +1,32 @@
+https://www.websequencediagrams.com/
+
+title Muistiinpanot sivu
+
+kayttaja->selain:
+note left of selain
+kayttaja klikkaa muistiinpanot-linkkiä
+end note
+
+selain->palvelin: GET  https://fullstack-exampleapp.herokuapp.com/notes
+note left of palvelin
+  muodostetaan HTML jossa muistiinpanot listassa
+end note
+palvelin->selain: status 200, sivun HTML-koodi
+
+selain->palvelin: GET https://fullstack-exampleapp.herokuapp.com/main.css
+note left of palvelin
+ palautetaan HTML-sivulle upotettu CSS-tiedosto
+end note
+palvelin->selain: status 200, sivun CSS-tiedosto
+
+selain->palvelin: GET https://fullstack-exampleapp.herokuapp.com/main.js
+note left of palvelin
+ palautetaan HTML-sivulle upotettu javascript-tiedosto
+end note
+palvelin->selain: status 200, sivun JS-tiedosto
+
+selain->palvelin: GET https://fullstack-exampleapp.herokuapp.com/data.json
+note left of palvelin
+ palautetaan JS-tiedostosta kutsuttu data.json
+end note
+palvelin->selain: status 200, sivun json-tiedosto
