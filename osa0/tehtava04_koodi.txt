@@ -1,0 +1,36 @@
+title Uusi muistiinpano
+
+kayttaja->selain:
+note left of selain
+kayttaja kirjoittaa uuden muistiinpanon ja painaa Talleta-nappia
+end note
+
+selain->palvelin: POST https://fullstack-exampleapp.herokuapp.com/new_note
+note left of palvelin
+  lähetetään hyötykuorma POST-viestissä
+end note
+palvelin->selain: status 302, FOUND
+
+selain->palvelin: GET  https://fullstack-exampleapp.herokuapp.com/notes
+note left of palvelin
+  muodostetaan HTML jossa muistiinpanot listassa, uusi tallennettu mukana
+end note
+palvelin->selain: status 200, sivun HTML-koodi
+
+selain->palvelin: GET https://fullstack-exampleapp.herokuapp.com/main.css
+note left of palvelin
+ palautetaan HTML-sivulle upotettu CSS-tiedosto
+end note
+palvelin->selain: status 200, sivun CSS-tiedosto
+
+selain->palvelin: GET https://fullstack-exampleapp.herokuapp.com/main.js
+note left of palvelin
+ palautetaan HTML-sivulle upotettu javascript-tiedosto
+end note
+palvelin->selain: status 200, sivun JS-tiedosto
+
+selain->palvelin: GET https://fullstack-exampleapp.herokuapp.com/data.json
+note left of palvelin
+ palautetaan JS-tiedostosta kutsuttu data.json
+end note
+palvelin->selain: status 200, sivun json-tiedosto
