@@ -1,0 +1,17 @@
+title SPA uuden muistiinpanon lisäys
+
+kayttaja->selain:
+note left of selain
+kayttaja lisää muistiinpanon ja painaa "Tallenna"-nappia
+end note
+
+selain->palvelin: POST https://fullstack-exampleapp.herokuapp.com/new_note_spa
+note left of palvelin
+  lähetetään uusi muistiinpano json-payloadina POST:illa
+end note
+palvelin->selain: status 201, Created 
+note left of palvelin
+  "message: created"
+  Selaimen javascript-koodi lisää uuden muistiinpanon
+  HTML-sivulle dynaamisesti
+end note
