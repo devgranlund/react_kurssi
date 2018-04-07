@@ -1,0 +1,31 @@
+title Single page application sivu
+
+kayttaja->selain:
+note left of selain
+kayttaja kirjoittaa selaimen osoiteriville 
+https://fullstack-exampleapp.herokuapp.com/spa
+end note
+
+selain->palvelin: GET https://fullstack-exampleapp.herokuapp.com/spa
+note left of palvelin
+  muodostetaan HTML-dokumentti
+end note
+palvelin->selain: status 200, HTML-dokumentti
+
+selain->palvelin: GET https://fullstack-exampleapp.herokuapp.com/main.css
+note left of palvelin
+  haetaan CSS-dokumentti
+end note
+palvelin->selain: status 200, CSS-dokumentti
+
+selain->palvelin: GET https://fullstack-exampleapp.herokuapp.com/main.js
+note left of palvelin
+ palautetaan HTML-sivulle upotettu javascript-tiedosto
+end note
+palvelin->selain: status 200, sivun JS-tiedosto
+
+selain->palvelin: GET https://fullstack-exampleapp.herokuapp.com/data.json
+note left of palvelin
+ palautetaan JS-tiedostosta kutsuttu data.json
+end note
+palvelin->selain: status 200, sivun json-tiedosto
