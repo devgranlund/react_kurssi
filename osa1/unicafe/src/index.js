@@ -34,7 +34,7 @@ class App extends React.Component {
             return 0
         }
         const huonot = this.state.huono_arvo * -1
-        return (this.state.hyva_arvo + huonot) / this.arvioidenMaara()
+        return Number(((this.state.hyva_arvo + huonot) / this.arvioidenMaara()).toFixed(1))
     }
     
     arvioidenMaara = () => {
@@ -45,7 +45,7 @@ class App extends React.Component {
         if (this.arvioidenMaara() <= 0){
             return 0
         }
-        return (this.state.hyva_arvo / this.arvioidenMaara()) * 100
+        return Number(((this.state.hyva_arvo / this.arvioidenMaara()) * 100).toFixed(1))
     }
 
     render(){
@@ -64,6 +64,7 @@ class App extends React.Component {
                 huonot={this.state.huono_arvo}
                 keskiarvo={this.laskeKeskiarvo()}
                 positiiviset={this.laskePositiiviset()}
+                arvioidenMaara={this.arvioidenMaara()}
             />
         </div>
         ) 
@@ -76,7 +77,12 @@ const Button = ({ onClickFunktio, teksti }) => {
     )
 }
 
-const Statistics = ({ hyvat, neutraalit, huonot, keskiarvo, positiiviset }) => {
+const Statistics = ({ hyvat, neutraalit, huonot, keskiarvo, positiiviset, arvioidenMaara }) => {
+    
+    if (arvioidenMaara <= 0){
+        return ( <div>ei yhtään palautetta annettu</div> )
+    }
+    
     return (
         <div>
             <Statistic laatu='hyvä' arvo={hyvat} yksikko=''/>
