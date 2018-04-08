@@ -26,19 +26,47 @@ class App extends React.Component {
         this.setState((prevState) => ({
             pisteet: kopio
         }));
-        console.log(this.state.pisteet)
+    }
+    
+    getAnecdoteInfo = () => {
+        let highestValue = 0
+        let highestIndex = 0
+        for (let i = 0; i < this.state.pisteet.length; i++) {
+            if (this.state.pisteet[i] > highestValue){
+                highestValue = this.state.pisteet[i]
+                highestIndex = i
+            }
+        }
+        const info = [anecdotes[highestIndex], highestValue]
+        return info
     }
 
     render() {
-        console.log('render')
         return (
             <div>
                 {this.props.anecdotes[this.state.selected]} <br/>
                 <button onClick={this.registerVote}>vote</button>
                 <button onClick={this.drawAnecdote}>next anecdote</button>
+                <HighestVote pisteet={this.getAnecdoteInfo()}/>
             </div>
         )
     }
+}
+
+const HighestVote = ({ pisteet }) => {
+    const votes = pisteet[1]
+    if (votes <= 0){
+        return (<h3>No votes</h3>)
+    }
+    
+    return(
+        <div>
+            <h3>anecdote with most votes:</h3>
+            <p>{pisteet[0]} <br/>
+            has {pisteet[1]} votes
+            </p>
+        </div>
+    )
 }
 
 const anecdotes = [
