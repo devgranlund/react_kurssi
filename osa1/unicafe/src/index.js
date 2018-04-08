@@ -75,18 +75,22 @@ const Statistics = ({ hyvat, neutraalit, huonot, keskiarvo, positiiviset, arvioi
     
     return (
         <div>
+            <table>
+                <tbody>
             <Statistic laatu='hyvä' arvo={hyvat} yksikko=''/>
             <Statistic laatu='neutraali' arvo={neutraalit} yksikko=''/>
             <Statistic laatu='huono' arvo={huonot} yksikko=''/>
             <Statistic laatu='keskiarvo' arvo={keskiarvo} yksikko=''/>
             <Statistic laatu='positiiviset' arvo={positiiviset} yksikko='%'/>
+                </tbody>
+            </table>
         </div>
     )
 }
 
 const Statistic = (props) => {
     return (
-        <p>{props.laatu} {props.arvo} {props.yksikko}</p>
+        <tr><td>{props.laatu}</td><td>{props.arvo}{props.yksikko}</td></tr>
     )
 }
 
