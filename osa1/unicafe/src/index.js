@@ -53,24 +53,42 @@ class App extends React.Component {
         <div>
             <h3>anna palautetta</h3>
             <div>
-                <button onClick={this.annaHyvaArvio}>hyvä</button>
-                <button onClick={this.annaNeutraaliArvio}>neutraali</button>
-                <button onClick={this.annaHuonoArvio}>huono</button>
+                <Button onClickFunktio={this.annaHyvaArvio} teksti="hyvä" />
+                <Button onClickFunktio={this.annaNeutraaliArvio} teksti="neutraali" />
+                <Button onClickFunktio={this.annaHuonoArvio} teksti="huono" />
             </div>
             <h3>statistiikkaa</h3>
-            <div>
-               <Palaute laatu='hyvä' arvo={this.state.hyva_arvo} yksikko=''/>
-               <Palaute laatu='neutraali' arvo={this.state.neutraali_arvo} yksikko=''/>
-               <Palaute laatu='huono' arvo={this.state.huono_arvo} yksikko=''/>
-               <Palaute laatu='keskiarvo' arvo={this.laskeKeskiarvo()} yksikko=''/>
-               <Palaute laatu='positiiviset' arvo={this.laskePositiiviset()} yksikko='%'/>
-            </div>
+            <Statistics 
+                hyvat={this.state.hyva_arvo} 
+                neutraalit={this.state.neutraali_arvo} 
+                huonot={this.state.huono_arvo}
+                keskiarvo={this.laskeKeskiarvo()}
+                positiiviset={this.laskePositiiviset()}
+            />
         </div>
         ) 
     }
 }
 
-const Palaute = (props) => {
+const Button = ({ onClickFunktio, teksti }) => {
+    return (
+        <button onClick={onClickFunktio}>{teksti}</button>
+    )
+}
+
+const Statistics = ({ hyvat, neutraalit, huonot, keskiarvo, positiiviset }) => {
+    return (
+        <div>
+            <Statistic laatu='hyvä' arvo={hyvat} yksikko=''/>
+            <Statistic laatu='neutraali' arvo={neutraalit} yksikko=''/>
+            <Statistic laatu='huono' arvo={huonot} yksikko=''/>
+            <Statistic laatu='keskiarvo' arvo={keskiarvo} yksikko=''/>
+            <Statistic laatu='positiiviset' arvo={positiiviset} yksikko='%'/>
+        </div>
+    )
+}
+
+const Statistic = (props) => {
     return (
         <p>{props.laatu} {props.arvo} {props.yksikko}</p>
     )
