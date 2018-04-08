@@ -11,22 +11,12 @@ class App extends React.Component {
         }
     }
 
-    annaHyvaArvio = () => {
-        this.setState((prevState) => ({
-            hyva_arvo: prevState.hyva_arvo + 1
-        }));
-    }
-    
-    annaNeutraaliArvio = () => {
-        this.setState((prevState) => ({
-            neutraali_arvo: prevState.neutraali_arvo + 1
-        }));
-    }
-    
-    annaHuonoArvio = () => {
-        this.setState((prevState) => ({
-            huono_arvo: prevState.huono_arvo + 1
-        }));
+    annaArvio = (arvo) => {
+        return () => {
+            this.setState((prevState) => ({
+                [arvo]: prevState[arvo] + 1
+            }));
+        }
     }
     
     laskeKeskiarvo = () => {
@@ -53,9 +43,9 @@ class App extends React.Component {
         <div>
             <h3>anna palautetta</h3>
             <div>
-                <Button onClickFunktio={this.annaHyvaArvio} teksti="hyvä" />
-                <Button onClickFunktio={this.annaNeutraaliArvio} teksti="neutraali" />
-                <Button onClickFunktio={this.annaHuonoArvio} teksti="huono" />
+                <Button onClickFunktio={this.annaArvio('hyva_arvo')} teksti="hyvä" />
+                <Button onClickFunktio={this.annaArvio('neutraali_arvo')} teksti="neutraali" />
+                <Button onClickFunktio={this.annaArvio('huono_arvo')} teksti="huono" />
             </div>
             <h3>statistiikkaa</h3>
             <Statistics 
