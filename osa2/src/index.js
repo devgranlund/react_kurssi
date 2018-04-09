@@ -13,10 +13,13 @@ const Sisalto = (props) => {
     )
 }
 const Yhteensa = (props) => {
-    const [osa1, osa2, osa3] = props.kurssi.osat
-
+    const laskeTehtavat = () => {
+        let tehtavia = 0
+        props.kurssi.osat.map(osa_item => tehtavia = tehtavia + osa_item.tehtavia)
+        return tehtavia
+    }
     return(
-        <p>yhteensä {osa1.tehtavia + osa2.tehtavia + osa3.tehtavia} tehtävää</p>
+        <p>yhteensä {laskeTehtavat()} tehtävää</p>
     )
 }
 const Kurssi = ({ kurssi }) => {
@@ -47,6 +50,11 @@ const App = () => {
                 nimi: 'Komponenttien tila',
                 tehtavia: 14,
                 id: 3
+            },
+            {
+                nimi: 'Redux',
+                tehtavia: 7,
+                id: 4
             }
         ]
     }
