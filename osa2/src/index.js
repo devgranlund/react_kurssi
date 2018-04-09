@@ -13,13 +13,9 @@ const Sisalto = (props) => {
     )
 }
 const Yhteensa = (props) => {
-    const laskeTehtavat = () => {
-        let tehtavia = 0
-        props.kurssi.osat.map(osa_item => tehtavia = tehtavia + osa_item.tehtavia)
-        return tehtavia
-    }
+    const reducer = (acc, cur) => acc + cur
     return(
-        <p>yhteensä {laskeTehtavat()} tehtävää</p>
+        <p>yhteensä {(props.kurssi.osat.map(osa_item => osa_item.tehtavia)).reduce(reducer, 0)} tehtävää</p>
     )
 }
 const Kurssi = ({ kurssi }) => {
