@@ -5,9 +5,11 @@ class App extends React.Component {
         super(props)
         this.state = {
             persons: [
-                { name: 'Arto Hellas' }
+                { name: 'Arto Hellas',
+                  number: '040 1234567'}
             ],
-            newName: ''
+            newName: '',
+            newNumber: ''
         }
     }
     
@@ -16,15 +18,18 @@ class App extends React.Component {
         if (this.personsContainsName(this.state.persons, this.state.newName)){
            console.log('nameExistsInList')
             this.setState(() => ({
-                newName: ''
+                newName: '',
+                newNumber: ''
+                
             }));
         } else {
             const persons_copy = [...this.state.persons]
-            const newPerson = { name: this.state.newName }
+            const newPerson = { name: this.state.newName, number: this.state.newNumber }
             persons_copy.push(newPerson)
             this.setState(() => ({
                 persons: persons_copy,
-                newName: ''
+                newName: '',
+                newNumber: ''
             }));
         }
     }
@@ -45,8 +50,14 @@ class App extends React.Component {
             })
     }
     
+    onNumberChanged = (event) => {
+        this.setState({
+            newNumber: event.target.value
+        })
+    }
+    
     getNames = () => {
-        return this.state.persons.map(person => <p key={person.name}>{person.name}</p>)
+        return this.state.persons.map(person => <p key={person.name}>{person.name}, numero: {person.number}</p>)
     }
 
     render() {
@@ -60,6 +71,12 @@ class App extends React.Component {
                             value={this.state.newName}
                             onChange={this.onNameChanged}
                         />
+                        <br/>
+                        numero:
+                        <input 
+                            value={this.state.newNumber}
+                            onChange={this.onNumberChanged}
+                            />
                     </div>
                     <div>
                         <button type="submit">lisää</button>
