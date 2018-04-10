@@ -12,14 +12,31 @@ class App extends React.Component {
     }
     
     addContact = (event) => {
-        event.preventDefault() 
-        const persons_copy = [...this.state.persons]
-        const newPerson = { name: this.state.newName }
-        persons_copy.push(newPerson)
-        this.setState(() => ({
-            persons: persons_copy,
-            newName: ''
-        }));
+        event.preventDefault()
+        if (this.personsContainsName(this.state.persons, this.state.newName)){
+           console.log('nameExistsInList')
+            this.setState(() => ({
+                newName: ''
+            }));
+        } else {
+            const persons_copy = [...this.state.persons]
+            const newPerson = { name: this.state.newName }
+            persons_copy.push(newPerson)
+            this.setState(() => ({
+                persons: persons_copy,
+                newName: ''
+            }));
+        }
+    }
+    
+    personsContainsName = (list, name) => {
+        let i
+        for (i = 0; i < list.length; i++) {
+            if (list[i].name === name) {
+                return true
+            }
+        }
+        return false
     }
     
     onNameChanged = (event) => {
