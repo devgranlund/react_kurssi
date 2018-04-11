@@ -1,21 +1,48 @@
-import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, {Component} from 'react';
+import axios from 'axios';
+import Countries from "./components/Countries";
 
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
-  }
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            countries: [],
+            filter: ''
+        }
+    }
+
+    componentDidMount() {
+        console.log('will mount')
+        axios
+            .get('https://restcountries.eu/rest/v2/all')
+            .then(response => {
+                console.log('promise fulfilled')
+                this.setState({countries: response.data})
+            })
+    }
+    
+    onFilterChange = (event) => {
+        this.setState({
+            filter: event.target.value
+        })       
+    }
+    
+    onCountrySelected = (event) => {
+        this.setState({
+            filter: event.target.textContent
+        })
+    }
+
+    render() {
+        return (
+            <div className="App">
+                find countries:
+                <input value={this.state.filter} onChange={this.onFilterChange}/>
+                <Countries countries={this.state.countries} filter={this.state.filter} onCountrySelected={this.onCountrySelected}/>
+            </div>
+        );
+    }
 }
 
 export default App;
