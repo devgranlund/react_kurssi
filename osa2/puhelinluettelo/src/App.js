@@ -35,14 +35,17 @@ class App extends React.Component {
 
             }));
         } else {
-            const persons_copy = [...this.state.persons]
             const newPerson = {name: this.state.newName, number: this.state.newNumber}
-            persons_copy.push(newPerson)
-            this.setState(() => ({
-                persons: persons_copy,
-                newName: '',
-                newNumber: ''
-            }));
+            axios.post('http://localhost:3001/persons', newPerson)
+                .then(response => {
+                    const persons_copy = [...this.state.persons]
+                    persons_copy.push(newPerson)
+                    this.setState({
+                        persons: persons_copy,
+                        newName: '',
+                        newNumber: ''
+                    })
+                })
         }
     }
 
