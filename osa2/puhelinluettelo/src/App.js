@@ -1,5 +1,5 @@
 import React from 'react';
-import axios from 'axios';
+import personService from './services/persons'
 import Filtering from './components/Filtering'
 import Persons from "./components/Person";
 import AddPersonForm from "./components/AddPersonForm";
@@ -17,11 +17,10 @@ class App extends React.Component {
 
     componentDidMount() {
         console.log('will mount')
-        axios
-            .get('http://localhost:3001/persons')
-            .then(response => {
+        personService.getAll()
+            .then(persons => {
                 console.log('promise fulfilled')
-                this.setState({ persons: response.data })
+                this.setState({ persons: persons })
             })
     }
 
@@ -36,8 +35,8 @@ class App extends React.Component {
             }));
         } else {
             const newPerson = {name: this.state.newName, number: this.state.newNumber}
-            axios.post('http://localhost:3001/persons', newPerson)
-                .then(response => {
+            personService.create(newPerson)
+                .then(persons => {
                     const persons_copy = [...this.state.persons]
                     persons_copy.push(newPerson)
                     this.setState({
