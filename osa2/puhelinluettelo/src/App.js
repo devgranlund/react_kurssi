@@ -3,6 +3,7 @@ import personService from './services/persons'
 import Filtering from './components/Filtering'
 import Persons from "./components/Person";
 import AddPersonForm from "./components/AddPersonForm";
+import Notification from "./components/Notification";
 
 class App extends React.Component {
     constructor(props) {
@@ -11,10 +12,13 @@ class App extends React.Component {
             persons: [],
             newName: '',
             newNumber: '',
-            filter: ''
+            filter: '',
+            notificationText: null,
+            notificationCssClass: ''
         }
     }
 
+    // React -framework callback-method
     componentDidMount() {
         console.log('will mount')
         personService.getAll()
@@ -36,19 +40,23 @@ class App extends React.Component {
     addNewPerson = () => {
         const newPerson = {name: this.state.newName, number: this.state.newNumber}
         personService.create(newPerson)
-            .then(persons => {
+            .then(person => {
+                newPerson.id = person.id
                 const persons_copy = [...this.state.persons]
                 persons_copy.push(newPerson)
                 this.setState({
                     persons: persons_copy,
                     newName: '',
-                    newNumber: ''
+                    newNumber: '',
+                    notificationText: `lisättiin '${newPerson.name}'`,
+                    notificationCssClass: 'success'
                 })
             })
+            this.removeNotificationAfterTimeout()
     }
 
     updatePerson = () => {
-        if (window.confirm(this.state.newName + " on jo luettelossa, korvataanko vanha numero uudella?")){
+        if (window.confirm(this.state.newName + " on jo luettelossa, korvataanko vanha numero uudella?")) {
             const personToUpdate = this.getPersonByName(this.state.newName)
             personToUpdate.number = this.state.newNumber
             personService.update(personToUpdate.id, personToUpdate)
@@ -58,9 +66,13 @@ class App extends React.Component {
                     this.setState({
                         persons: persons_copy,
                         newName: '',
-                        newNumber: ''
+                        newNumber: '',
+                        notificationText: `päivitettiin '${personToUpdate.name}'`,
+                        notificationCssClass: 'success'
                     })
                 })
+                this.removeNotificationAfterTimeout()
+            
         } else {
             this.setState({
                 newName: '',
@@ -75,9 +87,12 @@ class App extends React.Component {
                 .then(response => {
                     const persons_copy = this.state.persons.filter(person => person.id !== id)
                     this.setState({
-                        persons: persons_copy
+                        persons: persons_copy,
+                        notificationText: `poistettiin '${this.getNameById(id)}'`,
+                        notificationCssClass: 'success'
                     })
                 })
+                this.removeNotificationAfterTimeout()
         }
     }
 
@@ -112,15 +127,24 @@ class App extends React.Component {
     getNameById = (id) => {
         return this.state.persons.filter(person => person.id === id)[0].name
     }
-    
+
     getPersonByName = (name) => {
         return this.state.persons.filter(person => person.name === name)[0]
+    }
+    
+    removeNotificationAfterTimeout = () => {
+        setTimeout(() => {
+            this.setState({notificationText: null})
+        }, 5000)
     }
 
     render() {
         return (
             <div>
                 <h2>Puhelinluettelo</h2>
+                <Notification 
+                    message={this.state.notificationText} 
+                    cssClass={this.state.notificationCssClass} />
                 <Filtering value={this.state.filter} onChange={this.onFilterChanged}/>
                 <AddPersonForm
                     addOrUpdatePerson={this.addOrUpdatePerson}
