@@ -20,29 +20,62 @@ class App extends React.Component {
         personService.getAll()
             .then(persons => {
                 console.log('promise fulfilled')
-                this.setState({ persons: persons })
+                this.setState({persons: persons})
             })
     }
 
-    addContact = (event) => {
+    addOrUpdatePerson = (event) => {
         event.preventDefault()
         if (this.personsContainsName(this.state.persons, this.state.newName)) {
-            console.log('nameExistsInList')
-            this.setState(() => ({
-                newName: '',
-                newNumber: ''
-
-            }));
+            this.updatePerson()
         } else {
-            const newPerson = {name: this.state.newName, number: this.state.newNumber}
-            personService.create(newPerson)
-                .then(persons => {
+            this.addNewPerson()
+        }
+    }
+
+    addNewPerson = () => {
+        const newPerson = {name: this.state.newName, number: this.state.newNumber}
+        personService.create(newPerson)
+            .then(persons => {
+                const persons_copy = [...this.state.persons]
+                persons_copy.push(newPerson)
+                this.setState({
+                    persons: persons_copy,
+                    newName: '',
+                    newNumber: ''
+                })
+            })
+    }
+
+    updatePerson = () => {
+        if (window.confirm(this.state.newName + " on jo luettelossa, korvataanko vanha numero uudella?")){
+            const personToUpdate = this.getPersonByName(this.state.newName)
+            personToUpdate.number = this.state.newNumber
+            personService.update(personToUpdate.id, personToUpdate)
+                .then(person => {
                     const persons_copy = [...this.state.persons]
-                    persons_copy.push(newPerson)
+                    persons_copy.filter(perzon => perzon.id === personToUpdate.id)[0].number = this.state.newNumber
                     this.setState({
                         persons: persons_copy,
                         newName: '',
                         newNumber: ''
+                    })
+                })
+        } else {
+            this.setState({
+                newName: '',
+                newNumber: ''
+            })
+        }
+    }
+
+    onDeleteNameClicked = (id) => {
+        if (window.confirm("poistetaanko " + this.getNameById(id))) {
+            personService.deleteItem(id)
+                .then(response => {
+                    const persons_copy = this.state.persons.filter(person => person.id !== id)
+                    this.setState({
+                        persons: persons_copy
                     })
                 })
         }
@@ -76,20 +109,12 @@ class App extends React.Component {
         })
     }
 
-    onDeleteNameClicked = (id) => {
-        if (window.confirm("poistetaanko " + this.getNameById(id))){
-        personService.deleteItem(id)
-            .then(response => {
-                const persons_copy = this.state.persons.filter(person => person.id !== id)
-                this.setState({
-                    persons: persons_copy
-                })
-            })
-        }
-    }
-    
     getNameById = (id) => {
         return this.state.persons.filter(person => person.id === id)[0].name
+    }
+    
+    getPersonByName = (name) => {
+        return this.state.persons.filter(person => person.name === name)[0]
     }
 
     render() {
@@ -97,14 +122,15 @@ class App extends React.Component {
             <div>
                 <h2>Puhelinluettelo</h2>
                 <Filtering value={this.state.filter} onChange={this.onFilterChanged}/>
-                <AddPersonForm 
-                    addContact={this.addContact} 
+                <AddPersonForm
+                    addOrUpdatePerson={this.addOrUpdatePerson}
                     newName={this.state.newName}
                     onNameChanged={this.onNameChanged}
                     newNumber={this.state.newNumber}
                     onNumberChanged={this.onNumberChanged}
                 />
-                <Persons persons={this.state.persons} filter={this.state.filter} onDeleteNameClicked={this.onDeleteNameClicked}/>
+                <Persons persons={this.state.persons} filter={this.state.filter}
+                         onDeleteNameClicked={this.onDeleteNameClicked}/>
             </div>
         )
     }

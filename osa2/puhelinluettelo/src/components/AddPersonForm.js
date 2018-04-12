@@ -5,7 +5,7 @@ const AddPersonForm = (props) => {
     return (
         <div>
             <h2>Lisää uusi</h2>
-            <form onSubmit={props.addContact}>
+            <form onSubmit={props.addOrUpdatePerson}>
                 <div>
                     nimi:
                     <input
