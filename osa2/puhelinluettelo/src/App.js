@@ -76,6 +76,22 @@ class App extends React.Component {
         })
     }
 
+    onDeleteNameClicked = (id) => {
+        if (window.confirm("poistetaanko " + this.getNameById(id))){
+        personService.deleteItem(id)
+            .then(response => {
+                const persons_copy = this.state.persons.filter(person => person.id !== id)
+                this.setState({
+                    persons: persons_copy
+                })
+            })
+        }
+    }
+    
+    getNameById = (id) => {
+        return this.state.persons.filter(person => person.id === id)[0].name
+    }
+
     render() {
         return (
             <div>
@@ -88,7 +104,7 @@ class App extends React.Component {
                     newNumber={this.state.newNumber}
                     onNumberChanged={this.onNumberChanged}
                 />
-                <Persons persons={this.state.persons} filter={this.state.filter}/>
+                <Persons persons={this.state.persons} filter={this.state.filter} onDeleteNameClicked={this.onDeleteNameClicked}/>
             </div>
         )
     }
