@@ -71,6 +71,14 @@ class App extends React.Component {
                         notificationCssClass: 'success'
                     })
                 })
+                .catch(error => {
+                    const persons_copy = this.state.persons.filter(person => person.id !== personToUpdate.id)
+                    this.setState({
+                        persons: persons_copy,
+                        notificationText: `'${personToUpdate.name}' on vissiin jo poistettu`,
+                        notificationCssClass: 'error'
+                    })
+                })
                 this.removeNotificationAfterTimeout()
             
         } else {
