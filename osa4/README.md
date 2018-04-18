@@ -1,6 +1,7 @@
 ## Install
 - npm init
 - npm install eslint --save-dev
+- npm install jest --save-dev
 - npm install http --save
 - npm install express --save
 - npm install body-pareser --save
