@@ -27,6 +27,13 @@ class App extends React.Component {
                 this.setState({persons: persons})
             })
     }
+    
+    updatePersonsFromDB(){
+        return personService.getAll()
+            .then(persons => {
+                this.setState({persons: persons})
+            })
+    }
 
     addOrUpdatePerson = (event) => {
         event.preventDefault()
@@ -42,15 +49,13 @@ class App extends React.Component {
         personService.create(newPerson)
             .then(person => {
                 newPerson.id = person.id
-                const persons_copy = [...this.state.persons]
-                persons_copy.push(newPerson)
                 this.setState({
-                    persons: persons_copy,
                     newName: '',
                     newNumber: '',
                     notificationText: `lisättiin '${newPerson.name}'`,
                     notificationCssClass: 'success'
                 })
+                this.updatePersonsFromDB()
             })
             this.removeNotificationAfterTimeout()
     }
@@ -61,15 +66,13 @@ class App extends React.Component {
             personToUpdate.number = this.state.newNumber
             personService.update(personToUpdate.id, personToUpdate)
                 .then(person => {
-                    const persons_copy = [...this.state.persons]
-                    persons_copy.filter(perzon => perzon.id === personToUpdate.id)[0].number = this.state.newNumber
                     this.setState({
-                        persons: persons_copy,
                         newName: '',
                         newNumber: '',
                         notificationText: `päivitettiin '${personToUpdate.name}'`,
                         notificationCssClass: 'success'
                     })
+                    this.updatePersonsFromDB()
                 })
                 .catch(error => {
                     const persons_copy = this.state.persons.filter(person => person.id !== personToUpdate.id)
@@ -93,14 +96,13 @@ class App extends React.Component {
         if (window.confirm("poistetaanko " + this.getNameById(id))) {
             personService.deleteItem(id)
                 .then(response => {
-                    const persons_copy = this.state.persons.filter(person => person.id !== id)
                     this.setState({
-                        persons: persons_copy,
                         notificationText: `poistettiin '${this.getNameById(id)}'`,
                         notificationCssClass: 'success'
                     })
                 })
-                this.removeNotificationAfterTimeout()
+            this.updatePersonsFromDB()
+            this.removeNotificationAfterTimeout()
         }
     }
 
