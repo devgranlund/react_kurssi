@@ -100,8 +100,8 @@ class App extends React.Component {
                         notificationText: `poistettiin '${this.getNameById(id)}'`,
                         notificationCssClass: 'success'
                     })
+                    this.updatePersonsFromDB()
                 })
-            this.updatePersonsFromDB()
             this.removeNotificationAfterTimeout()
         }
     }
