@@ -30,6 +30,11 @@ describe('favorite blog', () => {
         const result = listHelper.favoriteBlog([])
         expect(result).toEqual({})
     })
+    test('when two blogs with max likes', () => {
+        const newBlogs = blogs.concat(favoriteBlog)
+        const result = listHelper.favoriteBlog(newBlogs)
+        expect(result).toEqual(favoriteBlog)
+    })
 })
 
 const listWithOneBlog = [
