@@ -8,3 +8,4 @@
 - npm install mongoose --save
 - npm install nodemon --save-dev
 - npm install dotenv --save
+- npm install morgan --save

@@ -4,18 +4,16 @@ const app = express()
 const bodyParser = require('body-parser')
 const cors = require('cors')
 const mongoose = require('mongoose')
+const morgan = require('morgan')
+const Blog = require('./models/blog')
 
-const Blog = mongoose.model('Blog', {
-    title: String,
-    author: String,
-    url: String,
-    likes: Number
+morgan.token('request-data', function getRequestData(req, res) {
+    return JSON.stringify(req.body)
 })
-
-module.exports = Blog
 
 app.use(cors())
 app.use(bodyParser.json())
+app.use(morgan(':method :url :request-data :status :res[content-length] - :response-time ms'))
 
 if (process.env.NODE_ENV !== 'production') {
     console.log('working in dev environment, using local env values')
