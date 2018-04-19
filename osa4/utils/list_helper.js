@@ -53,12 +53,40 @@ const mostBlogs = (blogs) => {
 }
 
 const mostLikes = (blogs) => {
-    return 0
+    if (blogs.length < 1){
+        return {}
+    }
+    const authorsWithLikes = blogs.reduce((allLikes, blog) => {
+        if (allLikes.find(current => current.author === blog.author)){
+            const currentLikes = allLikes.find(current => current.author === blog.author).likes
+            allLikes.find(current => current.author === blog.author).likes = currentLikes + blog.likes
+        } else {
+            const author = {
+                'author': blog.author,
+                'likes': blog.likes
+            }
+            allLikes.push(author)
+        }
+        return allLikes
+    }, [])
+    console.log(authorsWithLikes)
+    const authorWithMostLikes = authorsWithLikes.reduce((most, curr) => {
+        if (most !== {}) {
+            if (curr.likes > most.likes){
+                most = curr
+            }
+        } else {
+            most = curr
+        }
+        return most
+    })
+    return authorWithMostLikes
 }
 
 module.exports = {
     dummy,
     totalLikes,
     favoriteBlog,
-    mostBlogs
+    mostBlogs,
+    mostLikes
 }
