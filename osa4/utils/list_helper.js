@@ -23,8 +23,42 @@ const favoriteBlog = (blogs) => {
     }
 }
 
+const mostBlogs = (blogs) => {
+    if (blogs.length < 1){
+        return {}
+    }
+    const numbersOfBlogs = blogs.reduce((allNames, blog) => {
+        if (allNames.find(current => current.author === blog.author)){
+            allNames.find(current => current.author === blog.author).blogs++
+        } else {
+            const author = {
+                'author': blog.author,
+                'blogs': 1
+            }
+            allNames.push(author)
+        }
+        return allNames
+    }, [])
+    const authorWithMostBlogs = numbersOfBlogs.reduce((most, curr) => {
+        if (most !== {}) {
+            if (curr.blogs > most.blogs){
+                most = curr
+            }
+        } else {
+            most = curr
+        }
+        return most
+    })
+    return authorWithMostBlogs
+}
+
+const mostLikes = (blogs) => {
+    return 0
+}
+
 module.exports = {
     dummy,
     totalLikes,
-    favoriteBlog
+    favoriteBlog,
+    mostBlogs
 }
