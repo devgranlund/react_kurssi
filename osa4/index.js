@@ -5,9 +5,11 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const mongoose = require('mongoose')
 const morgan = require('morgan')
-const Blog = require('./models/blog')
 const blogsRouter = require('./controllers/blogs')
-app.use('/api/blogs', blogsRouter)
+const config = require('./utils/config')
+
+mongoose.connect(config.mongoUrl)
+mongoose.Promise = global.Promise
 
 morgan.token('request-data', function getRequestData(req, res) {
     return JSON.stringify(req.body)
@@ -16,16 +18,18 @@ morgan.token('request-data', function getRequestData(req, res) {
 app.use(cors())
 app.use(bodyParser.json())
 app.use(morgan(':method :url :request-data :status :res[content-length] - :response-time ms'))
+app.use('/api/blogs', blogsRouter)
 
-if (process.env.NODE_ENV !== 'production') {
-    console.log('working in dev environment, using local env values')
-    require('dotenv').config()
-}
+const server = http.createServer(app)
 
-const mongoUrl = process.env.MONGODB_URI
-mongoose.connect(mongoUrl)
-
-const PORT = 3003
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
+server.listen(config.port, () => {
+    console.log(`Server running on port ${config.port}`)
 })
+
+server.on('close', () => {
+    mongoose.connection.close()
+})
+
+module.exports = {
+    app, server
+}

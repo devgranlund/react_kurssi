@@ -10,3 +10,5 @@
 - npm install nodemon --save-dev
 - npm install dotenv --save
 - npm install morgan --save
+- npm install --save-dev cross-env
+- npm install --save-dev supertest

@@ -69,7 +69,6 @@ const mostLikes = (blogs) => {
         }
         return allLikes
     }, [])
-    console.log(authorsWithLikes)
     const authorWithMostLikes = authorsWithLikes.reduce((most, curr) => {
         if (most !== {}) {
             if (curr.likes > most.likes){

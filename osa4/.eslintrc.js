@@ -33,6 +33,9 @@ module.exports = {
         "no-unused-vars":0,
         "no-trailing-spaces":0
     },
+    "parserOptions": {
+        "ecmaVersion": 2017
+    },
     "globals": {
         "test": true,
         "expect": true,

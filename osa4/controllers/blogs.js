@@ -2,6 +2,7 @@ const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 
 blogsRouter.get('/', (request, response) => {
+    console.log('get called')
     Blog
         .find({})
         .then(blogs => {
