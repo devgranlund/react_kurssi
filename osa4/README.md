@@ -12,3 +12,8 @@
 - npm install morgan --save
 - npm install --save-dev cross-env
 - npm install --save-dev supertest
+
+## Jos palvelin jää perätilaan
+- Tsekkaa prosessi-id: lsof -i :3002
+- kill [pid] tai
+- kill -9 [pid]
