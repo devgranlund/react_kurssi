@@ -133,6 +133,43 @@ describe('blog api tests', () => {
         expect(typeof notFound).toBe('undefined')
         
     })
+    
+    test('blog can be edited', async () => {
+        const newBlog = {
+            'title': 'VIP-huoneen lumoissa',
+            'author': 'Jens Lapidus',
+            'url': 'www.jenslapidus.com',
+            'likes': 7
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        let response = await api
+            .get('/api/blogs')
+
+        const toBeEdited = response.body.find(one => one.author === 'Jens Lapidus')
+        expect(typeof toBeEdited).toBe('object')
+        expect(toBeEdited.likes).toBe(7)
+        
+        toBeEdited.likes = 9
+        
+        await api
+            .put('/api/blogs/' + toBeEdited._id)
+            .send(toBeEdited)
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+
+        response = await api
+            .get('/api/blogs')
+
+        const found = response.body.find(one => one.author === 'Jens Lapidus')
+        expect(typeof found).toBe('object')
+        expect(found.likes).toBe(9)
+    })
 
     afterAll(() => {
         server.close()
