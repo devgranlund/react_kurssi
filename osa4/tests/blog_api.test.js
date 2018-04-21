@@ -101,6 +101,38 @@ describe('blog api tests', () => {
             .expect('Content-Type', /application\/json/)
 
     })
+    
+    test('blog can be deleted', async () => {
+        const newBlog = {
+            'title': 'VIP-huoneen lumoissa',
+            'author': 'Jens Lapidus',
+            'url': 'www.jenslapidus.com',
+            'likes': 7
+        }
+
+        const toBeDeleted = await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        let response = await api
+            .get('/api/blogs')
+
+        const found = response.body.find(one => one.author === 'Jens Lapidus')
+        expect(typeof found).toBe('object')
+        
+        await api
+            .delete('/api/blogs/'+ found._id)
+            .expect(204)
+
+        response = await api
+            .get('/api/blogs')
+
+        const notFound = response.body.find(one => one.author === 'Jens Lapidus')
+        expect(typeof notFound).toBe('undefined')
+        
+    })
 
     afterAll(() => {
         server.close()
