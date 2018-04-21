@@ -1,17 +1,36 @@
 const supertest = require('supertest')
 const {app, server} = require('../index')
 const api = supertest(app)
+const Blog = require('../models/blog')
+const { initialBlogs, nonExistingId, blogsInDb } = require('./test_helper')
 
 describe('blog api tests', () => {
+    
+    beforeAll(async () => {
+        await Blog.remove()
+        console.log('DB cleared')
+
+        for (let blog of initialBlogs) {
+            let blogObject = new Blog(blog)
+            await blogObject.save()
+        }
+        console.log('DB initiated')
+    })
 
     test('blogs are returned as json', async () => {
-        await api
+        const blogsInDatabase = await blogsInDb()
+        
+        const response = await api
             .get('/api/blogs')
             .expect(200)
             .expect('Content-Type', /application\/json/)
+        
+        expect(response.body.length).toBe(blogsInDatabase.length)
     })
     
     test('blogs can be inserted', async () => {
+        const blogsInDatabase = await blogsInDb()
+
         const newBlog = {
             'title': 'Kuinka saisin rikki kookospähkinän?',
             'author': 'M.A. Numminen',
@@ -24,6 +43,13 @@ describe('blog api tests', () => {
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
+        
+        const response = await api.get('/api/blogs')
+        
+        const authors = response.body.map(b => b.author)
+
+        expect(response.body.length).toBe(blogsInDatabase.length + 1)
+        expect(authors).toContain('M.A. Numminen')
     })
     
     test('new blog without value in like gets initial value of 0', async () => {

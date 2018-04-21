@@ -1,32 +1,34 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 
-blogsRouter.get('/', (request, response) => {
-    Blog
-        .find({})
-        .then(blogs => {
-            response.json(blogs)
-        })
-})
-
-blogsRouter.post('/', (request, response) => {
-    const blog = sanitateNewBlog(new Blog(request.body))
-    if (checkIfValueMissing(blog.title) || checkIfValueMissing(blog.url)){
-        return response.status(400).json({ 'error': 'title or url missing' })
+blogsRouter.get('/', async (request, response) => {
+    try {
+        const blogs = await Blog.find({})
+        response.json(blogs)
+    } catch (exception) {
+        response.status(500).json({ 'error': 'server error' })
     }
-    blog
-        .save()
-        .then(result => {
-            response.status(201).json(result)
-        })
 })
 
-const sanitateNewBlog = (blog) => {
-    if (checkIfValueMissing(blog.likes)){
+blogsRouter.post('/', async (request, response) => {
+    try {
+        const blog = sanitiseNewBlog(new Blog(request.body))
+        if (checkIfValueMissing(blog.title) || checkIfValueMissing(blog.url)) {
+            return response.status(400).json({'error': 'title or url missing'})
+        }
+        const savedBlog = await blog.save()
+        response.status(201).json(savedBlog)
+    } catch (exception) {
+        response.status(500).json({ 'error': 'server error' })
+    }
+})
+
+const sanitiseNewBlog = (blog) => {
+    if (checkIfValueMissing(blog.likes)) {
         blog.likes = 0
     }
     return blog
-} 
+}
 
 const checkIfValueMissing = (val) => {
     return (val === undefined || val === null)
