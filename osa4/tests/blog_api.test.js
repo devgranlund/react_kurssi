@@ -13,7 +13,7 @@ describe('blog api tests', () => {
     
     test('blogs can be inserted', async () => {
         const newBlog = {
-            'title': 'Kuinka saisin rikki kookospähkinän',
+            'title': 'Kuinka saisin rikki kookospähkinän?',
             'author': 'M.A. Numminen',
             'url': 'www.manumminen.com',
             'likes': 2
@@ -44,6 +44,36 @@ describe('blog api tests', () => {
         
         const blog = response.body.find(one => one.author === 'Väinö Linna')
         expect(blog.likes).toBe(0)
+    })
+
+    test('new blog without url gets 400 response', async () => {
+        const newBlog = {
+            'title': 'Kokoomus on rikki',
+            'author': 'Harry Hjallis Harkimo',
+            'likes': 2
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+        
+    })
+
+    test('new blog without title gets 400 response', async () => {
+        const newBlog = {
+            'url': 'www.iItalehti.fi',
+            'author': 'Ulla Appelsin',
+            'likes': 0
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(400)
+            .expect('Content-Type', /application\/json/)
+
     })
 
     afterAll(() => {

@@ -11,6 +11,9 @@ blogsRouter.get('/', (request, response) => {
 
 blogsRouter.post('/', (request, response) => {
     const blog = sanitateNewBlog(new Blog(request.body))
+    if (checkIfValueMissing(blog.title) || checkIfValueMissing(blog.url)){
+        return response.status(400).json({ 'error': 'title or url missing' })
+    }
     blog
         .save()
         .then(result => {
@@ -19,10 +22,14 @@ blogsRouter.post('/', (request, response) => {
 })
 
 const sanitateNewBlog = (blog) => {
-    if (blog.likes === undefined || blog.likes === null){
+    if (checkIfValueMissing(blog.likes)){
         blog.likes = 0
     }
     return blog
 } 
+
+const checkIfValueMissing = (val) => {
+    return (val === undefined || val === null)
+}
 
 module.exports = blogsRouter
