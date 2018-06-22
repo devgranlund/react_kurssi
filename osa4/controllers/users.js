@@ -5,14 +5,10 @@ const checkIfValueMissing = require('../utils/utils')
 
 usersRouter.get('/', async (request, response) => {
     try {
-        const users = await User.find()
-        const sanitisedUsers = []
-        users.forEach(function(user){
-            delete user.password
-            console.log(user)
-            sanitisedUsers.push(user)
-        })
-        response.json(sanitisedUsers)
+        const users = await User
+            .find({})
+            .populate('blogs', { id: 1, likes: 1, author: 1, title: 1, url: 1 })
+        response.json(users.map(User.format))
     } catch (exception) {
         console.log(exception)
         response.status(500).json({ 'error': 'server error' })

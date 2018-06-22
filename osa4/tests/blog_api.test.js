@@ -123,7 +123,7 @@ describe('blog api tests', () => {
         expect(typeof found).toBe('object')
         
         await api
-            .delete('/api/blogs/'+ found._id)
+            .delete('/api/blogs/'+ found.id)
             .expect(204)
 
         response = await api
@@ -158,7 +158,7 @@ describe('blog api tests', () => {
         toBeEdited.likes = 9
         
         await api
-            .put('/api/blogs/' + toBeEdited._id)
+            .put('/api/blogs/' + toBeEdited.id)
             .send(toBeEdited)
             .expect(200)
             .expect('Content-Type', /application\/json/)

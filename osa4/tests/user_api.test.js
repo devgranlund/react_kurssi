@@ -118,6 +118,16 @@ describe('user api tests', () => {
             .expect(201)
     })
     
+    test('password is not returned in GET message', async () => {
+        const response = await api
+            .get('/api/users')
+            .expect(200)
+            .expect('Content-Type', /application\/json/)
+        
+        const first = response.body[0]
+        expect(typeof first.password).toBe('undefined')
+    })
+    
     afterAll(() => {
         server.close()
     })
