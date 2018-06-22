@@ -52,6 +52,72 @@ describe('user api tests', () => {
         expect(users).toContain('dadams')
     }) 
     
+    test('new user without adult info will be adult', async () => {
+        const newUser = {
+            'username': 'jjoyce',
+            'name': 'James Joyce',
+            'password': 'temppasswd4'
+        }
+        
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        const response = await api.get('/api/users')
+        const found = response.body.find(one => one.username === 'jjoyce')
+        expect(found.isAdult === true)
+    })
+    
+    test('new user with existing username will not be accepted', async () => {
+        const newUser = {
+            'username': 'jjoyce',
+            'name': 'James Joyce',
+            'password': 'temppasswd4'
+        }
+
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+    })
+    
+    test('password under three charactes will not be accepted', async () => {
+        let newUser = {
+            'username': 'ehemingway',
+            'name': 'Ernest Hemingway',
+            'password': 't'
+        }
+
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+
+        newUser = {
+            'username': 'ehemingway',
+            'name': 'Ernest Hemingway',
+            'password': 'tq'
+        }
+
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(400)
+
+        newUser = {
+            'username': 'ehemingway',
+            'name': 'Ernest Hemingway',
+            'password': 'tqr'
+        }
+
+        await api
+            .post('/api/users')
+            .send(newUser)
+            .expect(201)
+    })
+    
     afterAll(() => {
         server.close()
     })

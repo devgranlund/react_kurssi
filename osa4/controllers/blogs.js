@@ -1,5 +1,6 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
+const checkIfValueMissing = require('../utils/utils')
 
 blogsRouter.get('/', async (request, response) => {
     try {
@@ -55,10 +56,6 @@ const sanitiseNewBlog = (blog) => {
         blog.likes = 0
     }
     return blog
-}
-
-const checkIfValueMissing = (val) => {
-    return (val === undefined || val === null)
 }
 
 module.exports = blogsRouter
