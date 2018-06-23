@@ -2,6 +2,9 @@ const supertest = require('supertest')
 const {app, server} = require('../index')
 const api = supertest(app)
 const Blog = require('../models/blog')
+const User = require('../models/user')
+const bcrypt = require('bcrypt')
+let token = ''
 const { initialBlogs, nonExistingId, blogsInDb } = require('./test_helper')
 
 describe('blog api tests', () => {
@@ -14,6 +17,27 @@ describe('blog api tests', () => {
             let blogObject = new Blog(blog)
             await blogObject.save()
         }
+
+        let newUser = {
+            'username': 'cdickens',
+            'name': 'Charles Dickens',
+            'password': 'expectations1'
+        }
+        const saltRound = 10
+        newUser.password = await bcrypt.hash(newUser.password, saltRound)
+        const userObject = User(newUser)
+        await userObject.save()
+
+        let login = {
+            'username': 'cdickens',
+            'password': 'expectations1'
+        }
+        const resp = await api
+            .post('/api/login')
+            .send(login)
+        
+        token = resp.body.token
+        
         console.log('DB initiated')
     })
 
@@ -27,7 +51,22 @@ describe('blog api tests', () => {
         
         expect(response.body.length).toBe(blogsInDatabase.length)
     })
-    
+
+    test('blog cannot be inserted without token', async () => {
+        const newBlog = {
+            'title': 'Kuinka saisin rikki kookospähkinän?',
+            'author': 'M.A. Numminen',
+            'url': 'www.manumminen.com',
+            'likes': 2
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(401)
+            .expect('Content-Type', /application\/json/)
+    })
+
     test('blogs can be inserted', async () => {
         const blogsInDatabase = await blogsInDb()
 
@@ -40,6 +79,7 @@ describe('blog api tests', () => {
         
         await api
             .post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -61,6 +101,7 @@ describe('blog api tests', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -81,6 +122,7 @@ describe('blog api tests', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
             .send(newBlog)
             .expect(400)
             .expect('Content-Type', /application\/json/)
@@ -96,6 +138,7 @@ describe('blog api tests', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
             .send(newBlog)
             .expect(400)
             .expect('Content-Type', /application\/json/)
@@ -112,6 +155,7 @@ describe('blog api tests', () => {
 
         const toBeDeleted = await api
             .post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)
@@ -144,6 +188,7 @@ describe('blog api tests', () => {
 
         await api
             .post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
             .send(newBlog)
             .expect(201)
             .expect('Content-Type', /application\/json/)

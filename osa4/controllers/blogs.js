@@ -17,16 +17,22 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
     try {
-        //const token = getTokenFrom(request)
-        //const decodedToken = jwt.verify(token, process.ENV.SECRET)
+        const token = getTokenFrom(request)
+        if ( !token ){
+            return response.status(401).json({ 'error': 'token missing or invalid' })
+        }
+        
+        const decodedToken = jwt.verify(token, process.env.SECRET)
+        if ( !decodedToken.id ){
+            return response.status(401).json({ 'error': 'token missing or invalid' })
+        }
         
         const blog = sanitiseNewBlog(new Blog(request.body))
         if (checkIfValueMissing(blog.title) || checkIfValueMissing(blog.url)) {
             return response.status(400).json({'error': 'title or url missing'})
         }
         
-        // TEMP
-        const user = (await User.find({}))[0]
+        const user = await User.findById(decodedToken.id)
         blog.user = user.id
         
         const savedBlog = await blog.save()
@@ -36,7 +42,12 @@ blogsRouter.post('/', async (request, response) => {
         
         response.status(201).json(Blog.format(savedBlog))
     } catch (exception) {
-        response.status(500).json({ 'error': 'server error' })
+        console.log(exception)
+        if (exception.name === 'JsonWebTokenError' ) {
+            response.status(401).json({ 'error': exception.message })
+        } else {
+            response.status(500).json({ 'error': 'server error' })
+        }
     }
 })
 
