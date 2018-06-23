@@ -13,6 +13,7 @@
 - npm install --save-dev cross-env
 - npm install --save-dev supertest
 - npm install bcrypt --save
+- npm install jsonwebtoken --save
 
 ## Jos palvelin jää perätilaan
 - Tsekkaa prosessi-id: lsof -i :3002

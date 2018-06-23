@@ -7,6 +7,7 @@ const mongoose = require('mongoose')
 const morgan = require('morgan')
 const blogsRouter = require('./controllers/blogs')
 const usersRouter = require('./controllers/users')
+const loginRouter = require('./controllers/login')
 const config = require('./utils/config')
 
 mongoose.connect(config.mongoUrl)
@@ -21,6 +22,7 @@ app.use(bodyParser.json())
 app.use(morgan(':method :url :request-data :status :res[content-length] - :response-time ms'))
 app.use('/api/blogs', blogsRouter)
 app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
 
 const server = http.createServer(app)
 
