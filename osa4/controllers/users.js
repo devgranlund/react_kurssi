@@ -1,7 +1,7 @@
 const usersRouter = require('express').Router()
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
-const checkIfValueMissing = require('../utils/utils')
+const {checkIfValueMissing} = require('../utils/utils')
 
 usersRouter.get('/', async (request, response) => {
     try {

@@ -1,7 +1,8 @@
 const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
-const checkIfValueMissing = require('../utils/utils')
+const jwt = require('jsonwebtoken')
+const { checkIfValueMissing, getTokenFrom } = require('../utils/utils')
 
 blogsRouter.get('/', async (request, response) => {
     try {
@@ -16,6 +17,8 @@ blogsRouter.get('/', async (request, response) => {
 
 blogsRouter.post('/', async (request, response) => {
     try {
+        //const token = getTokenFrom(request)
+        //const decodedToken = jwt.verify(token, process.ENV.SECRET)
         
         const blog = sanitiseNewBlog(new Blog(request.body))
         if (checkIfValueMissing(blog.title) || checkIfValueMissing(blog.url)) {

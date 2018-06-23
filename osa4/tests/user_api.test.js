@@ -1,8 +1,8 @@
 const supertest = require('supertest')
-const {app, server} = require('../index')
+const { app, server } = require('../index')
 const api = supertest(app)
 const User = require('../models/user')
-const {initialUsers, usersInDb} = require('./test_helper')
+const { initialUsers, usersInDb } = require('./test_helper')
 
 describe('user api tests', () => {
 
