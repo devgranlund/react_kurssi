@@ -49,11 +49,26 @@ blogsRouter.post('/', async (request, response) => {
 // TODO delete joins
 blogsRouter.delete('/:id', async (request, response) => {
     try {
-        await Blog.findByIdAndRemove(request.params.id)
-        response.status(204).end()
+        const decodedToken = jwt.verify(request.token, process.env.SECRET)
+        if ( !decodedToken.id ){
+            return response.status(401).json({ 'error': 'token missing or invalid' })
+        }
+
+        const blog = await Blog.findById(request.params.id)
+        if ( blog.user.toString() === decodedToken.id.toString() ) {
+            await blog.remove()
+            response.status(204).end()
+        } else {
+            response.status(401).json({ 'error': 'not authorized to remove' })
+        }
+        
     } catch (exception) {
         console.log(exception)
-        response.status(500).json({ 'error': 'server error' })
+        if (exception.name === 'JsonWebTokenError' ) {
+            response.status(401).json({ 'error': exception.message })
+        } else {
+            response.status(500).json({ 'error': 'server error' })
+        }
     }
 })
 

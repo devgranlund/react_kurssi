@@ -144,10 +144,36 @@ describe('blog api tests', () => {
             .expect('Content-Type', /application\/json/)
 
     })
+
+    test('blog cannot be deleted without tokeun', async () => {
+        const newBlog = {
+            'title': 'Top Dog',
+            'author': 'Jens Lapidus',
+            'url': 'www.jenslapidus.com',
+            'likes': 9
+        }
+
+        const toBeDeleted = await api
+            .post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
+            .send(newBlog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        let response = await api
+            .get('/api/blogs')
+
+        const found = response.body.find(one => one.title === 'Top Dog')
+        expect(typeof found).toBe('object')
+
+        await api
+            .delete('/api/blogs/'+ found.id)
+            .expect(401)
+    })
     
     test('blog can be deleted', async () => {
         const newBlog = {
-            'title': 'VIP-huoneen lumoissa',
+            'title': 'Kova meno',
             'author': 'Jens Lapidus',
             'url': 'www.jenslapidus.com',
             'likes': 7
@@ -163,19 +189,74 @@ describe('blog api tests', () => {
         let response = await api
             .get('/api/blogs')
 
-        const found = response.body.find(one => one.author === 'Jens Lapidus')
+        const found = response.body.find(one => one.title === 'Kova meno')
         expect(typeof found).toBe('object')
         
         await api
             .delete('/api/blogs/'+ found.id)
+            .set('Authorization', 'bearer ' + token)            
             .expect(204)
 
         response = await api
             .get('/api/blogs')
 
-        const notFound = response.body.find(one => one.author === 'Jens Lapidus')
+        const notFound = response.body.find(one => one.title === 'Kova meno')
         expect(typeof notFound).toBe('undefined')
         
+    })
+    
+    test('blog cannot be deleted with wrong user', async () => {
+        const newBlog = {
+            'title': 'Ei voi poistaa',
+            'author': 'Jens Lapidus',
+            'url': 'www.jenslapidus.com',
+            'likes': 7
+        }
+
+        const canNotBeDeleted = await api
+            .post('/api/blogs')
+            .set('Authorization', 'bearer ' + token)
+            .send(newBlog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        let blogs = await api
+            .get('/api/blogs')
+
+        const inserted = blogs.body.find(one => one.title === 'Ei voi poistaa')
+        expect(typeof inserted).toBe('object')
+
+        let wrongUser = {
+            'username': 'tjones',
+            'name': 'Tom Jones',
+            'password': 'bignews1'
+        }
+        const saltRound = 10
+        wrongUser.password = await bcrypt.hash(wrongUser.password, saltRound)
+        const userObject = User(wrongUser)
+        await userObject.save()
+
+        let login = {
+            'username': 'tjones',
+            'password': 'bignews1'
+        }
+        const resp = await api
+            .post('/api/login')
+            .send(login)
+
+        const wrongToken = resp.body.token
+        
+        // try to delete with wrong token
+        await api
+            .delete('/api/blogs/'+ inserted.id)
+            .set('Authorization', 'bearer ' + wrongToken)
+            .expect(401)
+
+        let response = await api
+            .get('/api/blogs')
+
+        const found = response.body.find(one => one.title === 'Ei voi poistaa')
+        expect(typeof found).toBe('object')
     })
     
     test('blog can be edited', async () => {
@@ -196,7 +277,7 @@ describe('blog api tests', () => {
         let response = await api
             .get('/api/blogs')
 
-        const toBeEdited = response.body.find(one => one.author === 'Jens Lapidus')
+        const toBeEdited = response.body.find(one => one.title === 'VIP-huoneen lumoissa')
         expect(typeof toBeEdited).toBe('object')
         expect(toBeEdited.likes).toBe(7)
         
