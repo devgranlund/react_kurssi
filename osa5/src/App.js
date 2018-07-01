@@ -3,6 +3,7 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from "./components/Notification";
+import NewBlogForm from "./components/NewBlogForm";
 
 class App extends React.Component {
     constructor(props) {
@@ -12,7 +13,10 @@ class App extends React.Component {
             username: '',
             password: '',
             user: null,
-            blogs: []
+            blogs: [],
+            blogTitle: '',
+            blogAuthor: '',
+            blogUrl: ''
         }
     }
 
@@ -24,7 +28,6 @@ class App extends React.Component {
         if (auhtorizedUser) {
             const user = JSON.parse(auhtorizedUser)
             this.setState({user})
-          
         }
     }
 
@@ -40,6 +43,7 @@ class App extends React.Component {
                 password: this.state.password
             })
 
+            blogService.setToken(user.token)
             this.setState({username: '', password: '', user})
             window.localStorage.setItem('authorizedUser', JSON.stringify(user))
         } catch (exception) {
@@ -52,8 +56,28 @@ class App extends React.Component {
         }
     }
 
-    logout = async (event) => {
+    logout = (event) => {
         window.localStorage.removeItem('authorizedUser')
+    }
+
+    onCreateNewBlog = async (event) => {
+        event.preventDefault()
+        try {
+            const blog = await blogService.createNewBlog({
+                title: this.state.blogTitle,
+                author: this.state.blogAuthor,
+                url: this.state.blogUrl
+            }, this.state.user.token)
+            this.setState({blogTitle:'', blogAuthor:'', blogUrl:''})
+            window.location.reload()
+        } catch (exception) {
+            this.setState({
+                error: 'error ' + exception,
+            })
+            setTimeout(() => {
+                this.setState({error: null})
+            }, 5000)
+        }
     }
 
     render() {
@@ -90,7 +114,17 @@ class App extends React.Component {
                     {this.state.user.name} logged in.
                     <button>logout</button>
                 </form>
-                <br/><br/>
+                <br/>
+                <h3>create new</h3>
+                <NewBlogForm
+                    onCreateNewBlog={this.onCreateNewBlog}
+                    blogTitle={this.state.blogTitle}
+                    onBlogTitleChange={this.onFieldChange}
+                    blogAuthor={this.state.blogAuthor}
+                    onBlogAuthorChange={this.onFieldChange}
+                    blogUrl={this.state.blogUrl}
+                    onBlogUrlChange={this.onFieldChange}
+                /> <br/>
                 {this.state.blogs.map(blog =>
                     <Blog key={blog._id} blog={blog}/>
                 )}
