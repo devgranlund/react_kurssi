@@ -4,38 +4,12 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from "./components/Notification";
 import NewBlogForm from "./components/NewBlogForm";
+import LoginForm from "./components/LoginForm";
 
 class App extends React.Component {
-    constructor(props) {
-        super(props)
-        this.state = {
-            message: null,
-            cssClass: '',
-            username: '',
-            password: '',
-            user: null,
-            blogs: [],
-            blogTitle: '',
-            blogAuthor: '',
-            blogUrl: ''
-        }
-    }
-
-    componentDidMount() {
-        blogService.getAll().then(blogs =>
-            this.setState({blogs})
-        )
-        const auhtorizedUser = window.localStorage.getItem('authorizedUser')
-        if (auhtorizedUser) {
-            const user = JSON.parse(auhtorizedUser)
-            this.setState({user})
-        }
-    }
-
     onFieldChange = (event) => {
         this.setState({[event.target.name]: event.target.value})
     }
-
     login = async (event) => {
         event.preventDefault()
         try {
@@ -51,11 +25,9 @@ class App extends React.Component {
                 'error', false)
         }
     }
-
     logout = (event) => {
         window.localStorage.removeItem('authorizedUser')
     }
-
     onCreateNewBlog = async (event) => {
         event.preventDefault()
         try {
@@ -73,7 +45,6 @@ class App extends React.Component {
                 'error', false)
         }
     }
-    
     showNotification = ( message , cssClass, reload) => {
         this.setState({
             message: message,
@@ -90,29 +61,56 @@ class App extends React.Component {
         }, 5000)
     }
 
+    constructor(props) {
+        super(props)
+        this.state = {
+            message: null,
+            cssClass: '',
+            username: '',
+            password: '',
+            user: null,
+            blogs: [],
+            blogTitle: '',
+            blogAuthor: '',
+            blogUrl: '',
+            loginVisible: false
+        }
+    }
+    
+    componentDidMount() {
+        blogService.getAll().then(blogs =>
+            this.setState({blogs})
+        )
+        const authorizedUser = window.localStorage.getItem('authorizedUser')
+        if (authorizedUser) {
+            const user = JSON.parse(authorizedUser)
+            this.setState({user})
+        }
+    }
+
     render() {
         if (this.state.user === null) {
+            
+            const hideWhenVisible = { display: this.state.loginVisible ? 'none' : ''}
+            const showWhenVisible = { display: this.state.loginVisible ? '' : 'none'}
+            
             return (
                 <div>
                     <Notification
                         message={this.state.message}
                         cssClass={this.state.cssClass}/>
                     <h2>Log in to application</h2>
-                    <form onSubmit={this.login}>
-                        username:
-                        <input
-                            type="text"
-                            name="username"
-                            value={this.state.username}
-                            onChange={this.onFieldChange}/><br/>
-                        password:
-                        <input
-                            type="password"
-                            name="password"
-                            value={this.state.password}
-                            onChange={this.onFieldChange}/><br/>
-                        <button>login</button>
-                    </form>
+                    <div style={hideWhenVisible}>
+                        <button onClick={e => this.setState({ loginVisible: true })}>log in</button>
+                    </div>
+                    <div style={showWhenVisible}>
+                    <LoginForm
+                        handleSubmit={this.login}
+                        username={this.state.username} 
+                        password={this.state.password} 
+                        onFieldChange={this.onFieldChange}
+                    /></div>
+                    <button style={showWhenVisible} onClick={e => this.setState({ loginVisible: false })}>cancel</button>
                 </div>
             );
         }
