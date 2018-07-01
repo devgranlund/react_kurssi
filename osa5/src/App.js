@@ -9,7 +9,8 @@ class App extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            error: null,
+            message: null,
+            cssClass: '',
             username: '',
             password: '',
             user: null,
@@ -43,16 +44,11 @@ class App extends React.Component {
                 password: this.state.password
             })
 
-            blogService.setToken(user.token)
             this.setState({username: '', password: '', user})
             window.localStorage.setItem('authorizedUser', JSON.stringify(user))
         } catch (exception) {
-            this.setState({
-                error: 'käyttäjätunnus tai salasana virheellinen',
-            })
-            setTimeout(() => {
-                this.setState({error: null})
-            }, 5000)
+            this.showNotification('käyttäjätunnus tai salasana virheellinen', 
+                'error', false)
         }
     }
 
@@ -69,21 +65,38 @@ class App extends React.Component {
                 url: this.state.blogUrl
             }, this.state.user.token)
             this.setState({blogTitle:'', blogAuthor:'', blogUrl:''})
-            window.location.reload()
+            this.showNotification(
+                'a new blog ' + blog.title + ' by ' + blog.author + ' added',
+                'success', true)
         } catch (exception) {
-            this.setState({
-                error: 'error ' + exception,
-            })
-            setTimeout(() => {
-                this.setState({error: null})
-            }, 5000)
+            this.showNotification('error: ' + exception, 
+                'error', false)
         }
+    }
+    
+    showNotification = ( message , cssClass, reload) => {
+        this.setState({
+            message: message,
+            cssClass: cssClass
+        })
+        setTimeout(() => {
+            this.setState({
+                message: null,
+                cssClass: ''
+            })
+            if (reload) {
+                window.location.reload()
+            }
+        }, 5000)
     }
 
     render() {
         if (this.state.user === null) {
             return (
                 <div>
+                    <Notification
+                        message={this.state.message}
+                        cssClass={this.state.cssClass}/>
                     <h2>Log in to application</h2>
                     <form onSubmit={this.login}>
                         username:
@@ -100,9 +113,6 @@ class App extends React.Component {
                             onChange={this.onFieldChange}/><br/>
                         <button>login</button>
                     </form>
-                    <Notification
-                        message={this.state.error}
-                        cssClass={'error'}/>
                 </div>
             );
         }
@@ -110,6 +120,9 @@ class App extends React.Component {
         return (
             <div>
                 <h2>blogs</h2>
+                <Notification
+                    message={this.state.message}
+                    cssClass={this.state.cssClass}/>
                 <form onSubmit={this.logout}>
                     {this.state.user.name} logged in.
                     <button>logout</button>
