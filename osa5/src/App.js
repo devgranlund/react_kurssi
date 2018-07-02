@@ -95,6 +95,7 @@ class App extends React.Component {
         blogService.getAll().then(blogs =>
             this.setState({blogs})
         )
+        
         const authorizedUser = window.localStorage.getItem('authorizedUser')
         if (authorizedUser) {
             const user = JSON.parse(authorizedUser)
@@ -103,6 +104,12 @@ class App extends React.Component {
     }
 
     render() {
+        
+        let blogsCopy = this.state.blogs.slice(0)
+        blogsCopy.sort(function(a, b){
+            return b.likes - a.likes
+        })
+        
         if (this.state.user === null) {
             
             return (
@@ -144,7 +151,7 @@ class App extends React.Component {
                     blogUrl={this.state.blogUrl}
                     onBlogUrlChange={this.onFieldChange}
                 /> <br/>
-                {this.state.blogs.map(blog =>
+                {blogsCopy.map(blog =>
                     <Blog 
                         key={blog._id} 
                         blog={blog}
