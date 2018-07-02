@@ -59,6 +59,21 @@ class App extends React.Component {
                 'error', false)
         }
     }
+    onBlogDelete = async (blog) => {
+        try {
+            if (window.confirm("delete " + blog.title + " by " + blog.author)) {
+                const response = await blogService.deleteBlog(blog, this.state.user.token)
+                console.log(response)
+                this.showNotification(
+                    'blog deleted',
+                    'success', true)
+            }
+        } catch (exception) {
+            this.showNotification('error: ' + exception,
+                'error', false)
+        }
+        
+    }
     showNotification = ( message , cssClass, reload) => {
         this.setState({
             message: message,
@@ -156,6 +171,7 @@ class App extends React.Component {
                         key={blog._id} 
                         blog={blog}
                         onBlogLiked={this.onBlogLiked}
+                        onBlogDelete={this.onBlogDelete}
                     />
                 )}
             </div>

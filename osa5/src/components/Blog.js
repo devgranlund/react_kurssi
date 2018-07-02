@@ -24,6 +24,10 @@ class Blog extends React.Component {
     handleClick = (blog) => {
         this.props.onBlogLiked(blog)
     }
+    
+    handleDeleteClick = (blog) => {
+        this.props.onBlogDelete(blog)
+    }
 
     render() {
         
@@ -35,7 +39,8 @@ class Blog extends React.Component {
                 <div style={showWhenVisible} className="blogInnerStyle">
                     {this.props.blog.url} <br/>
                     {this.props.blog.likes} likes <button onClick={() => this.handleClick(this.props.blog)}>like</button> <br/>
-                    added by {this.safeGetUsersName()}
+                    added by {this.safeGetUsersName()} <br/>
+                    <button onClick={() => this.handleDeleteClick(this.props.blog)}>delete</button>
                 </div>
             </div>
         )

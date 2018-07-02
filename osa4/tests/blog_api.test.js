@@ -205,6 +205,26 @@ describe('blog api tests', () => {
         
     })
     
+    test('blog without user can be deleted by anyone', async () => {
+        let response = await api
+            .get('/api/blogs')
+        
+        const toBeDeleted = response.body.find(one => one.title === 'Meteoriitti')
+        expect(toBeDeleted.user).toBe(undefined)
+
+        await api
+            .delete('/api/blogs/'+ toBeDeleted.id)
+            .set('Authorization', 'bearer ' + token)
+            .expect(204)
+
+        // Check that can not be found anymore
+        response = await api
+            .get('/api/blogs')
+        const found = response.body.find(one => one.title === 'Meteoriitti')
+        expect(found).toBe(undefined)
+        
+    })
+    
     test('blog cannot be deleted with wrong user', async () => {
         const newBlog = {
             'title': 'Ei voi poistaa',

@@ -4,6 +4,8 @@ const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 const {checkIfValueMissing, getTokenFrom} = require('../utils/utils')
 
+// TODO user.blogs[] is not populated during save
+
 blogsRouter.get('/', async (request, response) => {
     try {
         const blogs = await Blog
@@ -46,7 +48,6 @@ blogsRouter.post('/', async (request, response) => {
     }
 })
 
-// TODO delete joins
 blogsRouter.delete('/:id', async (request, response) => {
     try {
         const decodedToken = jwt.verify(request.token, process.env.SECRET)
@@ -55,7 +56,9 @@ blogsRouter.delete('/:id', async (request, response) => {
         }
 
         const blog = await Blog.findById(request.params.id)
-        if (blog.user.toString() === decodedToken.id.toString()) {
+        if ((typeof blog.user === 'undefined')
+            ||
+            (blog.user.toString() === decodedToken.id.toString())) {
             await blog.remove()
             response.status(204).end()
         } else {
@@ -86,9 +89,9 @@ blogsRouter.put('/:id', async (request, response) => {
             url: body.url,
             likes: body.likes
         }
-        const user = await User.findById(decodedToken.id)
-        blog.user = user.id
         
+        blog.user = decodedToken.id
+
         const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {new: true})
         response.status(200).json(Blog.format(updatedBlog))
     } catch (exception) {
