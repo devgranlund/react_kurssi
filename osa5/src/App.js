@@ -46,6 +46,19 @@ class App extends React.Component {
                 'error', false)
         }
     }
+    onBlogLiked = async (blog) => {
+        try {
+            blog.likes = blog.likes + 1
+            blog.user = this.state.user.id
+            const response = await blogService.updateBlog(blog, this.state.user.token)
+            this.showNotification(
+                'blog ' + blog.title + ' by ' + blog.author + ' liked',
+                'success', true)
+        } catch (exception) {
+            this.showNotification('error: ' + exception,
+                'error', false)
+        }
+    }
     showNotification = ( message , cssClass, reload) => {
         this.setState({
             message: message,
@@ -132,7 +145,11 @@ class App extends React.Component {
                     onBlogUrlChange={this.onFieldChange}
                 /> <br/>
                 {this.state.blogs.map(blog =>
-                    <Blog key={blog._id} blog={blog}/>
+                    <Blog 
+                        key={blog._id} 
+                        blog={blog}
+                        onBlogLiked={this.onBlogLiked}
+                    />
                 )}
             </div>
         );

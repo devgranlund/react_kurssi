@@ -285,6 +285,7 @@ describe('blog api tests', () => {
         
         await api
             .put('/api/blogs/' + toBeEdited.id)
+            .set('Authorization', 'bearer ' + token)
             .send(toBeEdited)
             .expect(200)
             .expect('Content-Type', /application\/json/)
