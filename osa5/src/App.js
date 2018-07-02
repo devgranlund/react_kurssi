@@ -5,6 +5,7 @@ import loginService from './services/login'
 import Notification from "./components/Notification";
 import NewBlogForm from "./components/NewBlogForm";
 import LoginForm from "./components/LoginForm";
+import Togglable from "./components/Togglable"
 
 class App extends React.Component {
     onFieldChange = (event) => {
@@ -91,26 +92,20 @@ class App extends React.Component {
     render() {
         if (this.state.user === null) {
             
-            const hideWhenVisible = { display: this.state.loginVisible ? 'none' : ''}
-            const showWhenVisible = { display: this.state.loginVisible ? '' : 'none'}
-            
             return (
                 <div>
                     <Notification
                         message={this.state.message}
                         cssClass={this.state.cssClass}/>
                     <h2>Log in to application</h2>
-                    <div style={hideWhenVisible}>
-                        <button onClick={e => this.setState({ loginVisible: true })}>log in</button>
-                    </div>
-                    <div style={showWhenVisible}>
-                    <LoginForm
-                        handleSubmit={this.login}
-                        username={this.state.username} 
-                        password={this.state.password} 
-                        onFieldChange={this.onFieldChange}
-                    /></div>
-                    <button style={showWhenVisible} onClick={e => this.setState({ loginVisible: false })}>cancel</button>
+                    <Togglable buttonLabel='log in'>
+                        <LoginForm
+                            handleSubmit={this.login}
+                            username={this.state.username} 
+                            password={this.state.password} 
+                            onFieldChange={this.onFieldChange}
+                        />
+                    </Togglable>
                 </div>
             );
         }
