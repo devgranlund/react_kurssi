@@ -49,11 +49,18 @@ class App extends React.Component {
     onBlogLiked = async (blog) => {
         try {
             blog.likes = blog.likes + 1
-            blog.user = this.state.user.id
-            const response = await blogService.updateBlog(blog, this.state.user.token)
+            const updatedBlog = {
+                id: blog.id,
+                user: blog.user._id,
+                likes: blog.likes,
+                author: blog.author,
+                title: blog.title,
+                url: blog.url
+            }
+            const response = await blogService.updateBlog(updatedBlog, this.state.user.token)
             this.showNotification(
                 'blog ' + blog.title + ' by ' + blog.author + ' liked',
-                'success', true)
+                'success', false)
         } catch (exception) {
             this.showNotification('error: ' + exception,
                 'error', false)
@@ -172,6 +179,7 @@ class App extends React.Component {
                         blog={blog}
                         onBlogLiked={this.onBlogLiked}
                         onBlogDelete={this.onBlogDelete}
+                        user={this.state.user}
                     />
                 )}
             </div>

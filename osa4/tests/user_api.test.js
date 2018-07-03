@@ -7,7 +7,11 @@ const { initialUsers, usersInDb } = require('./test_helper')
 describe('user api tests', () => {
 
     beforeAll(async () => {
-        await User.remove()
+        // We should remove only objects that are created in these tests, 
+        // objects that are already in the DB should be left there to be used in manual testing.
+        await User.remove({ username: 'dadams' })
+        await User.remove({ username: 'jjoyce' })
+        await User.remove({ username: 'ehemingway' })
         console.log('DB cleared')
 
         for (let user of initialUsers) {

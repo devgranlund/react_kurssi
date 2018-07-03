@@ -83,16 +83,18 @@ blogsRouter.put('/:id', async (request, response) => {
         }
 
         const body = request.body
+        if (body.user === undefined || body.user === null){
+            return response.status(400).json({'error': 'blog user missing'})
+        }
         const blog = {
             title: body.title,
             author: body.author,
             url: body.url,
-            likes: body.likes
+            likes: body.likes,
+            user: body.user
         }
-        
-        blog.user = decodedToken.id
 
-        const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {new: true})
+        const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog)
         response.status(200).json(Blog.format(updatedBlog))
     } catch (exception) {
         console.log(exception)

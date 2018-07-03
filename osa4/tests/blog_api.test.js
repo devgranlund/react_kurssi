@@ -5,12 +5,14 @@ const Blog = require('../models/blog')
 const User = require('../models/user')
 const bcrypt = require('bcrypt')
 let token = ''
+let wrongToken = ''
 const { initialBlogs, nonExistingId, blogsInDb } = require('./test_helper')
 
 describe('blog api tests', () => {
     
     beforeAll(async () => {
         await Blog.remove()
+        await User.remove()
         console.log('DB cleared')
 
         for (let blog of initialBlogs) {
@@ -37,6 +39,26 @@ describe('blog api tests', () => {
             .send(login)
         
         token = resp.body.token
+
+        let wrongUser = {
+            'username': 'tjones',
+            'name': 'Tom Jones',
+            'password': 'bignews1'
+        }
+        
+        wrongUser.password = await bcrypt.hash(wrongUser.password, saltRound)
+        const wrongUserObject = User(wrongUser)
+        await wrongUserObject.save()
+
+        let wrongLogin = {
+            'username': 'tjones',
+            'password': 'bignews1'
+        }
+        const wrongResp = await api
+            .post('/api/login')
+            .send(wrongLogin)
+
+        wrongToken = wrongResp.body.token
         
         console.log('DB initiated')
     })
@@ -245,26 +267,6 @@ describe('blog api tests', () => {
 
         const inserted = blogs.body.find(one => one.title === 'Ei voi poistaa')
         expect(typeof inserted).toBe('object')
-
-        let wrongUser = {
-            'username': 'tjones',
-            'name': 'Tom Jones',
-            'password': 'bignews1'
-        }
-        const saltRound = 10
-        wrongUser.password = await bcrypt.hash(wrongUser.password, saltRound)
-        const userObject = User(wrongUser)
-        await userObject.save()
-
-        let login = {
-            'username': 'tjones',
-            'password': 'bignews1'
-        }
-        const resp = await api
-            .post('/api/login')
-            .send(login)
-
-        const wrongToken = resp.body.token
         
         // try to delete with wrong token
         await api
@@ -301,6 +303,8 @@ describe('blog api tests', () => {
         expect(typeof toBeEdited).toBe('object')
         expect(toBeEdited.likes).toBe(7)
         
+        const userId = toBeEdited.user.id
+        
         toBeEdited.likes = 9
         
         await api
@@ -313,9 +317,10 @@ describe('blog api tests', () => {
         response = await api
             .get('/api/blogs')
 
-        const found = response.body.find(one => one.author === 'Jens Lapidus')
+        const found = response.body.find(one => one.title === 'VIP-huoneen lumoissa')
         expect(typeof found).toBe('object')
         expect(found.likes).toBe(9)
+        expect(found.user.id).toBe(userId)
     })
 
     afterAll(() => {

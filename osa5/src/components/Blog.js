@@ -21,26 +21,34 @@ class Blog extends React.Component {
         }
     }
 
-    handleClick = (blog) => {
+    handleLikeClick = (blog) => {
         this.props.onBlogLiked(blog)
     }
     
     handleDeleteClick = (blog) => {
         this.props.onBlogDelete(blog)
     }
+    
+    renderDeleteButton = () => {
+        if (this.props.user === null){
+            return ''
+        } else if ((this.props.blog.user !== null) && (this.props.blog.user !== undefined) && (this.props.user.id !== this.props.blog.user._id)) {
+            return ''
+        } else {
+            return <button onClick={() => this.handleDeleteClick(this.props.blog)}>delete</button>
+        }
+    }
 
     render() {
-        
         const showWhenVisible = {display: this.state.detailsVisible ? '' : 'none'}
-
         return (
             <div className="blogStyle" onClick={this.toggleDetails}>
                 {this.props.blog.title} {this.props.blog.author}
                 <div style={showWhenVisible} className="blogInnerStyle">
                     {this.props.blog.url} <br/>
-                    {this.props.blog.likes} likes <button onClick={() => this.handleClick(this.props.blog)}>like</button> <br/>
+                    {this.props.blog.likes} likes <button onClick={() => this.handleLikeClick(this.props.blog)}>like</button> <br/>
                     added by {this.safeGetUsersName()} <br/>
-                    <button onClick={() => this.handleDeleteClick(this.props.blog)}>delete</button>
+                    {this.renderDeleteButton()}
                 </div>
             </div>
         )
