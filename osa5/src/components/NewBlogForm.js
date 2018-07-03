@@ -26,11 +26,11 @@ const NewBlogForm = (props) => {
 
 NewBlogForm.propTypes = {
     blogTitle: PropTypes.string.isRequired,
-    onBlogTitleChange: PropTypes.string.isRequired,
+    onBlogTitleChange: PropTypes.func.isRequired,
     blogAuthor: PropTypes.string.isRequired,
-    onBlogAuthorChange: PropTypes.string.isRequired,
+    onBlogAuthorChange: PropTypes.func.isRequired,
     blogUrl: PropTypes.string.isRequired,
-    onBlogUrlChange: PropTypes.string.isRequired
+    onBlogUrlChange: PropTypes.func.isRequired
 }
 
 export default NewBlogForm
