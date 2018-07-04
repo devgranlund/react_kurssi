@@ -21,4 +21,22 @@ describe.only('<SimpleBlog />', () => {
         expect(headerDiv.text()).toContain(blog.title + ' ' + blog.author)
         expect(likesDiv.text()).toContain(blog.likes)
     })
+    
+    it('like button works as spefified', () => {
+        const blog = {
+            title: 'Blog title text',
+            author: 'Blog author name',
+            likes: 3
+        }
+        
+        const mockHandler = jest.fn()
+        
+        const simpleBlogComponent = shallow(<SimpleBlog blog={blog} onClick={mockHandler}/>)
+        
+        const button = simpleBlogComponent.find('button')
+        button.simulate('click')
+        button.simulate('click')
+        
+        expect(mockHandler.mock.calls.length).toBe(2)
+    })
 })
