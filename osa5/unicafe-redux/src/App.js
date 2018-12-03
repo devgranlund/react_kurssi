@@ -1,10 +1,19 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { createStore } from 'redux'
+import counterReducer from './reducer'
+
+const store = createStore(counterReducer)
+
+const positiivisia = () => {
+    return (store.getState().good * 100) / (store.getState().good + store.getState().ok + store.getState().bad)
+}
 
 const Statistiikka = () => {
-    const palautteita = 0
 
-    if (palautteita === 0) {
+    if ((store.getState().good === 0) 
+        && (store.getState().ok === 0)
+        && (store.getState().bad === 0)) {
         return (
             <div>
                 <h2>stataistiikka</h2>
@@ -20,35 +29,31 @@ const Statistiikka = () => {
                 <tbody>
                     <tr>
                         <td>hyvä</td>
-                        <td></td>
+                        <td>{store.getState().good}</td>
                     </tr>
                     <tr>
                         <td>neutraali</td>
-                        <td></td>
+                        <td>{store.getState().ok}</td>
                     </tr>
                     <tr>
                         <td>huono</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td>keskiarvo</td>
-                        <td></td>
+                        <td>{store.getState().bad}</td>
                     </tr>
                     <tr>
                         <td>positiivisia</td>
-                        <td></td>
+                        <td>{positiivisia()} %</td>
                     </tr>
                 </tbody>
             </table>
 
-            <button>nollaa tilasto</button>
+            <button onClick={() => {store.dispatch({ type: 'ZERO' })}}>nollaa tilasto</button>
         </div >
     )
 }
 
 class App extends React.Component {
     klik = (nappi) => () => {
-
+        store.dispatch({ type: nappi })
     }
 
     render() {
@@ -64,6 +69,11 @@ class App extends React.Component {
     }
 }
 
-ReactDOM.render(<App />, document.getElementById('root'))
+const render = () => {
+    ReactDOM.render(<App />, document.getElementById('root'))
+}
+
+render()
+store.subscribe(render)
 
 export default App
