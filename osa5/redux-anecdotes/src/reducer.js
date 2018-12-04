@@ -21,15 +21,27 @@ const initialState = anecdotesAtStart.map(asObject)
 
 const reducer = (state = initialState, action) => {
   let newState
-  for (let i = 0; i < state.length; i++){
-    if (state[i].id.toString() === action.type) {
-      const edited = {content: state[i].content, id: state[i].id, votes: state[i].votes + 1}
-      newState = [...state]
-      newState[i] = edited
-      state = newState
-    }
+    if (action.type === 'VOTE'){
+      for (let i = 0; i < state.length; i++){
+        if (state[i].id.toString() === action.data) {
+          const edited = {content: state[i].content, id: state[i].id, votes: state[i].votes + 1}
+          newState = [...state]
+          newState[i] = edited
+          state = newState
+        }
+      }
+    } 
+  return state.sort(compare)
+}
+
+const compare = (a,b) => {
+  if (a.votes < b.votes){
+    return 1;
+  } 
+  if (a.votes > b.votes){
+    return -1;
   }
-  return state
+  return 0;
 }
 
 export default reducer

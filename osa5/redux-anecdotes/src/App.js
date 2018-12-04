@@ -14,7 +14,7 @@ class App extends React.Component {
             </div>
             <div>
               has {anecdote.votes}
-              <button onClick={() => {this.props.store.dispatch({ type: anecdote.id })}}>vote</button>
+              <button onClick={() => {this.props.store.dispatch({ type: 'VOTE', data: anecdote.id })}}>vote</button>
             </div>
           </div>
         )}
