@@ -1,18 +1,19 @@
 import React from 'react'
 
 class Notification extends React.Component {
-  render() {
-    const style = {
-      border: 'solid',
-      padding: 10,
-      borderWidth: 1
+    render() {
+        const style = {
+            border: 'solid',
+            padding: 10,
+            borderWidth: 1
+        }
+        const notifications = this.props.store.getState().notifications
+        return (
+            <div style={style}>
+                {notifications.message}
+            </div>
+        )
     }
-    return (
-      <div style={style}>
-        render here notification...
-      </div>
-    )
-  }
 }
 
 export default Notification
