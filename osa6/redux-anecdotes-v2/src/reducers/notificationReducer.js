@@ -3,7 +3,35 @@ const initialState = {
 }
 
 const notificationReducer = (store = initialState, action) => {
-    return store
+    switch (action.type) {
+    case 'SHOW_NOTIFICATION':
+        return action
+    case 'CLEAR_NOTIFICATION':
+        return ''
+    default:
+        return store
+    }
+}
+
+export const showVotedNotification = (anecdote) => {
+    return {
+        type: 'SHOW_NOTIFICATION',
+        message: 'you voted ' + anecdote
+    }
+}
+
+export const showCreatedNotification = (notification) => {
+    return {
+        type: 'SHOW_NOTIFICATION',
+        message: 'you created ' + notification
+    }
+}
+
+export const clearNotification = () => {
+    return {
+        type: 'CLEAR_NOTIFICATION',
+        message: ''
+    }
 }
 
 export default notificationReducer
