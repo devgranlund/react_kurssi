@@ -2,6 +2,7 @@ import React from 'react'
 import { voteAnecdote } from '../reducers/anecdoteReducer'
 import { showVotedNotification } from '../reducers/notificationReducer'
 import { clearNotification } from '../reducers/notificationReducer'
+import Filter from './Filter'
 
 class AnecdoteList extends React.Component {
     render() {
@@ -16,21 +17,24 @@ class AnecdoteList extends React.Component {
         return (
             <div>
                 <h2>Anecdotes</h2>
-                {anecdotes.sort((a, b) => b.votes - a.votes).map(anecdote =>
-                    <div key={anecdote.id}>
-                        <div>
-                            {anecdote.content}
-                        </div>
-                        <div>
+                <Filter store={this.props.store}/>
+                {anecdotes.sort((a, b) => b.votes - a.votes)
+                    .filter(anecdote => anecdote.content.includes(this.props.store.getState().filter.filter))
+                    .map(anecdote =>
+                        <div key={anecdote.id}>
+                            <div>
+                                {anecdote.content}
+                            </div>
+                            <div>
               has {anecdote.votes}
-                            <button onClick={() =>
-                                voted(anecdote)
-                            }>
+                                <button onClick={() =>
+                                    voted(anecdote)
+                                }>
                 vote
-                            </button>
+                                </button>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
             </div>
         )
     }
