@@ -9,10 +9,10 @@ class AnecdoteList extends React.Component {
     render() {
         const anecdotes = this.props.anecdotes
         const voted = (anecdote) => {
-            this.props.store.dispatch(voteAnecdote(anecdote.id))
-            this.props.store.dispatch(showVotedNotification(anecdote.content))
+            this.props.voteAnecdote(anecdote.id)
+            this.props.showVotedNotification(anecdote.content)
             setTimeout(() => {
-                this.props.store.dispatch(clearNotification())
+                this.props.clearNotification()
             }, 5000)
         }
         return (
@@ -48,6 +48,12 @@ const mapStateToProps = (store) => {
     }
 }
 
-const ConnectedAnecdoteList = connect(mapStateToProps)(AnecdoteList)
+const mapDispatchToProps = {
+    clearNotification,
+    showVotedNotification,
+    voteAnecdote
+}
+
+const ConnectedAnecdoteList = connect(mapStateToProps, mapDispatchToProps)(AnecdoteList)
 
 export default ConnectedAnecdoteList
