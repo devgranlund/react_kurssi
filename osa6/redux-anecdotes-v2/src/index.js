@@ -1,10 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import App from './App'
-import { createStore, combineReducers } from 'redux'
+import { applyMiddleware, createStore, combineReducers } from 'redux'
+import { Provider } from 'react-redux'
 import anecdoteReducer from './reducers/anecdoteReducer'
 import notificationReducer from './reducers/notificationReducer'
 import filterReducer from './reducers/filterReducer'
+import logger from 'redux-logger'
 
 const reducer = combineReducers({
     anecdotes: anecdoteReducer,
@@ -12,14 +14,11 @@ const reducer = combineReducers({
     filter: filterReducer
 })
 
-const store = createStore(reducer)
+const store = createStore(reducer, applyMiddleware(logger))
 
-const render = () => {
-    ReactDOM.render(
-        <App store={store} />,
-        document.getElementById('root')
-    )
-}
-
-render()
-store.subscribe(render)
+ReactDOM.render(
+    <Provider store={store}>
+        <App />
+    </Provider>,
+    document.getElementById('root'))
+//store.subscribe(render)
