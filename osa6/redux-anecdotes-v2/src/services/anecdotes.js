@@ -12,6 +12,9 @@ const createNew = async (content) => {
     return response.data
 }
 
-//const getId = () => (100000*Math.random()).toFixed(0)
+const update = async (object) => {
+    const response = await axios.put(url + '/' + object.id, object)
+    return response.data
+}
 
-export default { getAll , createNew }
+export default { getAll , createNew, update }
