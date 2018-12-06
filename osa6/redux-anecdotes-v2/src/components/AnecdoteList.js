@@ -7,7 +7,6 @@ import { connect } from 'react-redux'
 
 class AnecdoteList extends React.Component {
     render() {
-        const anecdotes = this.props.anecdotes
         const voted = (anecdote) => {
             this.props.voteAnecdote(anecdote.id)
             this.props.showVotedNotification(anecdote.content)
@@ -18,9 +17,8 @@ class AnecdoteList extends React.Component {
         return (
             <div>
                 <h2>Anecdotes</h2>
-                <Filter store={this.props.store}/>
-                {anecdotes.sort((a, b) => b.votes - a.votes)
-                    .filter(anecdote => anecdote.content.includes(this.props.filter.filter))
+                <Filter />
+                {this.props.visibleAnecdotes
                     .map(anecdote =>
                         <div key={anecdote.id}>
                             <div>
@@ -41,10 +39,15 @@ class AnecdoteList extends React.Component {
     }
 }
 
+const anecdotesToShow = (anecdotes, filter) => {
+    return anecdotes
+        .filter(anecdote => anecdote.content.includes(filter.filter))
+        .sort((a, b) => b.votes - a.votes)
+}
+
 const mapStateToProps = (store) => {
     return {
-        anecdotes: store.anecdotes,
-        filter: store.filter
+        visibleAnecdotes: anecdotesToShow(store.anecdotes, store.filter)
     }
 }
 

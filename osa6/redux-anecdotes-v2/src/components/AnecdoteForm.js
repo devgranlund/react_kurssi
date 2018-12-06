@@ -28,17 +28,12 @@ class AnecdoteForm extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => {
-    return {
-    }
-}
-
 const mapDispatchToProps = {
     clearNotification,
     showCreatedNotification,
     createAnecdote
 }
 
-const ConnectedAnecdoteForm = connect(mapStateToProps, mapDispatchToProps)(AnecdoteForm)
+const ConnectedAnecdoteForm = connect(null, mapDispatchToProps)(AnecdoteForm)
 
 export default ConnectedAnecdoteForm
