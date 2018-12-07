@@ -23,10 +23,9 @@ const initialState = anecdotesAtStart.map(asObject)
 
 const anecdoteReducer = (store = initialState, action) => {
     if (action.type==='VOTE') {
-        const old = store.filter(a => a.id !==action.id)
-        const voted = store.find(a => a.id === action.id)
+        const old = store.filter(a => a.id !==action.anecdote.id)
 
-        return [...old, { ...voted, votes: voted.votes+1 } ]
+        return [...old, action.anecdote ]
     }
     if (action.type === 'CREATE') {
 
@@ -40,17 +39,24 @@ const anecdoteReducer = (store = initialState, action) => {
     return store
 }
 
-export const voteAnecdote = (id) => {
-    return {
-        type: 'VOTE',
-        id: id
+export const voteAnecdote = (anecdote) => {
+    return async (dispatch) => {
+        anecdote.votes = anecdote.votes + 1
+        await anecdoteService.update(anecdote)
+        dispatch({
+            type: 'VOTE',
+            anecdote: anecdote
+        })
     }
 }
 
-export const createAnecdote = (data) => {
-    return {
-        type: 'CREATE',
-        data: data
+export const createAnecdote = (content) => {
+    return async (dispatch) => {
+        const newAnecdote = await anecdoteService.createNew(content)
+        dispatch({
+            type: 'CREATE',
+            data: newAnecdote
+        })
     }
 }
 

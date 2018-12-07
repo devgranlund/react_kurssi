@@ -20,10 +20,10 @@ export const showVotedNotification = (anecdote) => {
     }
 }
 
-export const showCreatedNotification = (notification) => {
+export const showCreatedNotification = (content) => {
     return {
         type: 'SHOW_NOTIFICATION',
-        message: 'you created ' + notification.content
+        message: 'you created ' + content
     }
 }
 

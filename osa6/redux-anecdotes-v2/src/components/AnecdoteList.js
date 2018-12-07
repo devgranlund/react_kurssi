@@ -4,14 +4,11 @@ import { showVotedNotification } from '../reducers/notificationReducer'
 import { clearNotification } from '../reducers/notificationReducer'
 import Filter from './Filter'
 import { connect } from 'react-redux'
-import anecdoteService from '../services/anecdotes'
 
 class AnecdoteList extends React.Component {
     render() {
         const voted = async (anecdote) => {
-            this.props.voteAnecdote(anecdote.id)
-            anecdote.votes = anecdote.votes +1
-            await anecdoteService.update(anecdote)
+            this.props.voteAnecdote(anecdote)
             this.props.showVotedNotification(anecdote.content)
             setTimeout(() => {
                 this.props.clearNotification()
