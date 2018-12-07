@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 
-const Menu = ({ state, addNew }) => (
+const Menu = ({ state, addNew, anecdoteById }) => (
     <div>
         <Router>
             <div>
@@ -11,8 +11,11 @@ const Menu = ({ state, addNew }) => (
                     <Link to='/about'>about</Link>&nbsp;
                 </div>
                 <Route exact path='/' render={() => <AnecdoteList anecdotes={ state.anecdotes }/>} />
-                <Route path='/create' render={() => <CreateNew addNew={addNew}/>} />
-                <Route path='/about' render={() => <About />} />
+                <Route exact path='/create' render={() => <CreateNew addNew={addNew}/>} />
+                <Route exact path='/about' render={() => <About />} />
+                <Route exact path='/anecdotes/:id' render={({ match }) =>
+                    <Anecdote anecdote={anecdoteById(match.params.id)} />}
+                />
             </div>
         </Router>
     </div>
@@ -22,8 +25,19 @@ const AnecdoteList = ({ anecdotes }) => (
     <div>
         <h2>Anecdotes</h2>
         <ul>
-            {anecdotes.map(anecdote => <li key={anecdote.id} >{anecdote.content}</li>)}
+            {anecdotes.map(anecdote =>
+                <li key={anecdote.id} >
+                    <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+                </li>)}
         </ul>
+    </div>
+)
+
+const Anecdote = ({ anecdote }) => (
+    <div>
+        <h2>{anecdote.content}</h2>
+        <p>has {anecdote.votes} votes</p>
+        <p>for more info see <a href={anecdote.info}>{anecdote.info}</a></p>
     </div>
 )
 
@@ -149,7 +163,7 @@ class App extends React.Component {
       return (
           <div>
               <h1>Software anecdotes</h1>
-              <Menu state={this.state} addNew={this.addNew}/>
+              <Menu state={this.state} addNew={this.addNew} anecdoteById={this.anecdoteById}/>
               <Footer />
           </div>
       )
