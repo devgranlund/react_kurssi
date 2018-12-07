@@ -1,7 +1,7 @@
 import React from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 
-const Menu = ({ state, addNew, anecdoteById }) => (
+const Menu = ({ state, addNew, anecdoteById, addNotification }) => (
     <div>
         <Router>
             <div>
@@ -10,8 +10,14 @@ const Menu = ({ state, addNew, anecdoteById }) => (
                     <Link to='/create'>create new</Link>&nbsp;
                     <Link to='/about'>about</Link>&nbsp;
                 </div>
-                <Route exact path='/' render={() => <AnecdoteList anecdotes={ state.anecdotes }/>} />
-                <Route exact path='/create' render={() => <CreateNew addNew={addNew}/>} />
+                <Route exact path='/' render={() => <AnecdoteList
+                    anecdotes={ state.anecdotes }
+                    notification={ state.notification }/>} />
+                <Route exact path='/create' render={({ history }) => <CreateNew
+                    addNew={addNew}
+                    addNotification={addNotification}
+                    history={history}
+                />} />
                 <Route exact path='/about' render={() => <About />} />
                 <Route exact path='/anecdotes/:id' render={({ match }) =>
                     <Anecdote anecdote={anecdoteById(match.params.id)} />}
@@ -21,8 +27,11 @@ const Menu = ({ state, addNew, anecdoteById }) => (
     </div>
 )
 
-const AnecdoteList = ({ anecdotes }) => (
+const AnecdoteList = ({ anecdotes, notification }) => (
     <div>
+        <div>
+            {notification}
+        </div>
         <h2>Anecdotes</h2>
         <ul>
             {anecdotes.map(anecdote =>
@@ -86,6 +95,11 @@ class CreateNew extends React.Component {
           info: this.state.info,
           votes: 0
       })
+      this.props.addNotification('a new anecdote ' + this.state.content + ' created')
+      this.props.history.push('/')
+      setTimeout(() => {
+          this.props.addNotification('')
+      },  10000)
   }
 
   render() {
@@ -159,11 +173,19 @@ class App extends React.Component {
       this.setState({ anecdotes })
   }
 
+  addNotification = (notification) => {
+      this.setState( { notification: notification })
+  }
+
   render() {
       return (
           <div>
               <h1>Software anecdotes</h1>
-              <Menu state={this.state} addNew={this.addNew} anecdoteById={this.anecdoteById}/>
+              <Menu state={this.state}
+                  addNew={this.addNew}
+                  anecdoteById={this.anecdoteById}
+                  addNotification={this.addNotification}
+              />
               <Footer />
           </div>
       )
