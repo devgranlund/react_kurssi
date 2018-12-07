@@ -13,10 +13,15 @@ const notificationReducer = (store = initialState, action) => {
     }
 }
 
-export const showVotedNotification = (anecdote) => {
-    return {
-        type: 'SHOW_NOTIFICATION',
-        message: 'you voted ' + anecdote
+export const showVotedNotification = (anecdote, visibilityTimeInSec) => {
+    return async (dispatch) => {
+        dispatch({
+            type: 'SHOW_NOTIFICATION',
+            message: 'you voted ' + anecdote
+        })
+        await setTimeout(() => {
+            dispatch(clearNotification())
+        },  visibilityTimeInSec * 1000)
     }
 }
 
