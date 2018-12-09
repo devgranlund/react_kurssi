@@ -27,9 +27,18 @@ const Menu = ({ state, addNew, anecdoteById, addNotification }) => (
     </div>
 )
 
+const notificationStyle = {
+    color: 'green',
+    borderColor: 'green',
+    fontColor: 'green',
+    borderRadius: '3ßpx',
+    borderWidth: '1px',
+    borderStyle: 'solid'
+}
+
 const AnecdoteList = ({ anecdotes, notification }) => (
     <div>
-        <div>
+        <div style={notificationStyle}>
             {notification}
         </div>
         <h2>Anecdotes</h2>
