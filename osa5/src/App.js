@@ -2,14 +2,16 @@ import React from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import Notification from "./components/Notification";
-import NewBlogForm from "./components/NewBlogForm";
-import LoginForm from "./components/LoginForm";
-import Togglable from "./components/Togglable"
+import Notification from './components/Notification'
+import NewBlogForm from './components/NewBlogForm'
+import LoginForm from './components/LoginForm'
+import Togglable from './components/Togglable'
+import { Table } from 'react-bootstrap'
+
 
 class App extends React.Component {
     onFieldChange = (event) => {
-        this.setState({[event.target.name]: event.target.value})
+        this.setState({ [event.target.name]: event.target.value })
     }
     login = async (event) => {
         event.preventDefault()
@@ -19,10 +21,10 @@ class App extends React.Component {
                 password: this.state.password
             })
 
-            this.setState({username: '', password: '', user})
+            this.setState({ username: '', password: '', user })
             window.localStorage.setItem('authorizedUser', JSON.stringify(user))
         } catch (exception) {
-            this.showNotification('käyttäjätunnus tai salasana virheellinen', 
+            this.showNotification('käyttäjätunnus tai salasana virheellinen',
                 'error', false)
         }
     }
@@ -37,12 +39,12 @@ class App extends React.Component {
                 author: this.state.blogAuthor,
                 url: this.state.blogUrl
             }, this.state.user.token)
-            this.setState({blogTitle:'', blogAuthor:'', blogUrl:''})
+            this.setState({ blogTitle:'', blogAuthor:'', blogUrl:'' })
             this.showNotification(
                 'a new blog ' + blog.title + ' by ' + blog.author + ' added',
                 'success', true)
         } catch (exception) {
-            this.showNotification('error: ' + exception, 
+            this.showNotification('error: ' + exception,
                 'error', false)
         }
     }
@@ -68,7 +70,7 @@ class App extends React.Component {
     }
     onBlogDelete = async (blog) => {
         try {
-            if (window.confirm("delete " + blog.title + " by " + blog.author)) {
+            if (window.confirm('delete ' + blog.title + ' by ' + blog.author)) {
                 const response = await blogService.deleteBlog(blog, this.state.user.token)
                 console.log(response)
                 this.showNotification(
@@ -79,7 +81,7 @@ class App extends React.Component {
             this.showNotification('error: ' + exception,
                 'error', false)
         }
-        
+
     }
     showNotification = ( message , cssClass, reload) => {
         this.setState({
@@ -112,30 +114,30 @@ class App extends React.Component {
             loginVisible: false
         }
     }
-    
+
     componentDidMount() {
         blogService.getAll().then(blogs =>
-            this.setState({blogs})
+            this.setState({ blogs })
         )
-        
+
         const authorizedUser = window.localStorage.getItem('authorizedUser')
         if (authorizedUser) {
             const user = JSON.parse(authorizedUser)
-            this.setState({user})
+            this.setState({ user })
         }
     }
 
     render() {
-        
+
         let blogsCopy = this.state.blogs.slice(0)
         blogsCopy.sort(function(a, b){
             return b.likes - a.likes
         })
-        
+
         if (this.state.user === null) {
-            
+
             return (
-                <div>
+                <div className='container'>
                     <Notification
                         message={this.state.message}
                         cssClass={this.state.cssClass}/>
@@ -143,17 +145,17 @@ class App extends React.Component {
                     <Togglable buttonLabel='log in'>
                         <LoginForm
                             handleSubmit={this.login}
-                            username={this.state.username} 
-                            password={this.state.password} 
+                            username={this.state.username}
+                            password={this.state.password}
                             onFieldChange={this.onFieldChange}
                         />
                     </Togglable>
                 </div>
-            );
+            )
         }
         // else
         return (
-            <div>
+            <div className='container'>
                 <h2>blogs</h2>
                 <Notification
                     message={this.state.message}
@@ -173,18 +175,22 @@ class App extends React.Component {
                     blogUrl={this.state.blogUrl}
                     onBlogUrlChange={this.onFieldChange}
                 /> <br/>
+                <Table striped>
+                    <tbody>
                 {blogsCopy.map(blog =>
-                    <Blog 
-                        key={blog._id} 
+                    <Blog
+                        key={blog._id}
                         blog={blog}
                         onBlogLiked={this.onBlogLiked}
                         onBlogDelete={this.onBlogDelete}
                         user={this.state.user}
                     />
                 )}
+                    </tbody>
+                </Table>
             </div>
-        );
+        )
     }
 }
 
-export default App;
+export default App

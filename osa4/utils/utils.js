@@ -10,7 +10,7 @@ const getTokenFrom = (request) => {
     return null
 }
 
-module.exports = { 
-    checkIfValueMissing, 
-    getTokenFrom 
+module.exports = {
+    checkIfValueMissing,
+    getTokenFrom
 }

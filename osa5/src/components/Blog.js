@@ -10,7 +10,7 @@ class Blog extends React.Component {
     }
 
     toggleDetails = () => {
-        this.setState({detailsVisible: !this.state.detailsVisible})
+        this.setState({ detailsVisible: !this.state.detailsVisible })
     }
 
     safeGetUsersName = () => {
@@ -24,11 +24,11 @@ class Blog extends React.Component {
     handleLikeClick = (blog) => {
         this.props.onBlogLiked(blog)
     }
-    
+
     handleDeleteClick = (blog) => {
         this.props.onBlogDelete(blog)
     }
-    
+
     renderDeleteButton = () => {
         if (this.props.user === null){
             return ''
@@ -40,17 +40,19 @@ class Blog extends React.Component {
     }
 
     render() {
-        const showWhenVisible = {display: this.state.detailsVisible ? '' : 'none'}
+        const showWhenVisible = { display: this.state.detailsVisible ? '' : 'none' }
         return (
-            <div className="blogStyle" onClick={this.toggleDetails}>
-                {this.props.blog.title} {this.props.blog.author}
-                <div style={showWhenVisible} className="blogInnerStyle">
-                    {this.props.blog.url} <br/>
-                    {this.props.blog.likes} likes <button onClick={() => this.handleLikeClick(this.props.blog)}>like</button> <br/>
+            <tr className="blogStyle" onClick={this.toggleDetails}>
+                <td>
+                    {this.props.blog.title} {this.props.blog.author}
+                    <div style={showWhenVisible} className="blogInnerStyle">
+                        {this.props.blog.url} <br/>
+                        {this.props.blog.likes} likes <button onClick={() => this.handleLikeClick(this.props.blog)}>like</button> <br/>
                     added by {this.safeGetUsersName()} <br/>
-                    {this.renderDeleteButton()}
-                </div>
-            </div>
+                        {this.renderDeleteButton()}
+                    </div>
+                </td>
+            </tr>
         )
     }
 }
