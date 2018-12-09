@@ -1,6 +1,6 @@
 import React from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
-import { ListGroup, ListGroupItem, Grid, Row, Col } from 'react-bootstrap'
+import { Alert, ListGroup, ListGroupItem, Grid, Row, Col, FormGroup, FormControl, ControlLabel, Button } from 'react-bootstrap'
 
 const menuStyle = {
     backgroundColor: '#4EDBFE',
@@ -35,19 +35,12 @@ const Menu = ({ state, addNew, anecdoteById, addNotification }) => (
     </div>
 )
 
-const notificationStyle = {
-    color: 'green',
-    borderColor: 'green',
-    fontColor: 'green',
-    borderRadius: '3px',
-    borderWidth: '1px',
-    borderStyle: 'solid'
-}
-
 const AnecdoteList = ({ anecdotes, notification }) => (
     <div>
-        <div style={notificationStyle}>
-            {notification}
+        <div>
+            {(notification &&
+                <Alert color='success'>{notification}</Alert>
+            )}
         </div>
         <h2>Anecdotes</h2>
         <ListGroup>
@@ -133,19 +126,21 @@ class CreateNew extends React.Component {
           <div>
               <h2>create a new anecdote</h2>
               <form onSubmit={this.handleSubmit}>
-                  <div>
-            content
-                      <input name='content' value={this.state.content} onChange={this.handleChange} />
-                  </div>
-                  <div>
-            author
-                      <input name='author' value={this.state.author} onChange={this.handleChange} />
-                  </div>
-                  <div>
-            url for more info
-                      <input name='info' value={this.state.info} onChange={this.handleChange} />
-                  </div>
-                  <button>create</button>
+                  <FormGroup>
+                      <div>
+                          <ControlLabel>Content:</ControlLabel>
+                          <FormControl name='content' value={this.state.content} onChange={this.handleChange} />
+                      </div>
+                      <div>
+                          <ControlLabel>Author:</ControlLabel>
+                          <FormControl name='author' value={this.state.author} onChange={this.handleChange} />
+                      </div>
+                      <div>
+                          <ControlLabel>Url for more info:</ControlLabel>
+                          <FormControl name='info' value={this.state.info} onChange={this.handleChange} />
+                      </div>
+                      <Button bsStyle='success' type='submit'>create</Button>
+                  </FormGroup>
               </form>
           </div>
       )
