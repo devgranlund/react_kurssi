@@ -11,7 +11,7 @@ const positiivisia = () => {
 
 const Statistiikka = () => {
 
-    if ((store.getState().good === 0) 
+    if ((store.getState().good === 0)
         && (store.getState().ok === 0)
         && (store.getState().bad === 0)) {
         return (

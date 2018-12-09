@@ -1,11 +1,11 @@
-import React from 'react';
+import React from 'react'
 
 class App extends React.Component {
 
     addAnecdote = (event) => {
         event.preventDefault()
         const content = event.target.anecdote.value
-        this.props.store.dispatch({type: 'NEW_ANECDOTE', data: content})
+        this.props.store.dispatch({ type: 'NEW_ANECDOTE', data: content })
         event.target.anecdote.value = ''
     }
 
@@ -22,7 +22,7 @@ class App extends React.Component {
                         <div>
                             has {anecdote.votes}
                             <button onClick={() => {
-                                this.props.store.dispatch({type: 'VOTE', data: anecdote.id})
+                                this.props.store.dispatch({ type: 'VOTE', data: anecdote.id })
                             }}>vote
                             </button>
                         </div>

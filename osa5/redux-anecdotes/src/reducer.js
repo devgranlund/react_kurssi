@@ -24,7 +24,7 @@ const reducer = (state = initialState, action) => {
     if (action.type === 'VOTE') {
         for (let i = 0; i < state.length; i++) {
             if (state[i].id.toString() === action.data) {
-                const edited = {content: state[i].content, id: state[i].id, votes: state[i].votes + 1}
+                const edited = { content: state[i].content, id: state[i].id, votes: state[i].votes + 1 }
                 newState = [...state]
                 newState[i] = edited
                 state = newState
@@ -39,12 +39,12 @@ const reducer = (state = initialState, action) => {
 
 const compare = (a, b) => {
     if (a.votes < b.votes) {
-        return 1;
+        return 1
     }
     if (a.votes > b.votes) {
-        return -1;
+        return -1
     }
-    return 0;
+    return 0
 }
 
 export default reducer

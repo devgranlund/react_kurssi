@@ -7,6 +7,8 @@ import NewBlogForm from './components/NewBlogForm'
 import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
 import { Table } from 'react-bootstrap'
+import { connect } from 'react-redux'
+import { showNotification } from './reducers/notificationReducer'
 
 
 class App extends React.Component {
@@ -24,7 +26,7 @@ class App extends React.Component {
             this.setState({ username: '', password: '', user })
             window.localStorage.setItem('authorizedUser', JSON.stringify(user))
         } catch (exception) {
-            this.showNotification('käyttäjätunnus tai salasana virheellinen',
+            this.props.showNotification('käyttäjätunnus tai salasana virheellinen',
                 'error', false)
         }
     }
@@ -40,11 +42,11 @@ class App extends React.Component {
                 url: this.state.blogUrl
             }, this.state.user.token)
             this.setState({ blogTitle:'', blogAuthor:'', blogUrl:'' })
-            this.showNotification(
+            this.props.showNotification(
                 'a new blog ' + blog.title + ' by ' + blog.author + ' added',
                 'success', true)
         } catch (exception) {
-            this.showNotification('error: ' + exception,
+            this.props.showNotification('error: ' + exception,
                 'error', false)
         }
     }
@@ -60,11 +62,11 @@ class App extends React.Component {
                 url: blog.url
             }
             const response = await blogService.updateBlog(updatedBlog, this.state.user.token)
-            this.showNotification(
+            this.props.showNotification(
                 'blog ' + blog.title + ' by ' + blog.author + ' liked',
                 'success', false)
         } catch (exception) {
-            this.showNotification('error: ' + exception,
+            this.props.showNotification('error: ' + exception,
                 'error', false)
         }
     }
@@ -73,37 +75,20 @@ class App extends React.Component {
             if (window.confirm('delete ' + blog.title + ' by ' + blog.author)) {
                 const response = await blogService.deleteBlog(blog, this.state.user.token)
                 console.log(response)
-                this.showNotification(
+                this.props.showNotification(
                     'blog deleted',
                     'success', true)
             }
         } catch (exception) {
-            this.showNotification('error: ' + exception,
+            this.props.showNotification('error: ' + exception,
                 'error', false)
         }
 
-    }
-    showNotification = ( message , cssClass, reload) => {
-        this.setState({
-            message: message,
-            cssClass: cssClass
-        })
-        setTimeout(() => {
-            this.setState({
-                message: null,
-                cssClass: ''
-            })
-            if (reload) {
-                window.location.reload()
-            }
-        }, 5000)
     }
 
     constructor(props) {
         super(props)
         this.state = {
-            message: null,
-            cssClass: '',
             username: '',
             password: '',
             user: null,
@@ -138,9 +123,7 @@ class App extends React.Component {
 
             return (
                 <div className='container'>
-                    <Notification
-                        message={this.state.message}
-                        cssClass={this.state.cssClass}/>
+                    <Notification/>
                     <h2>Log in to application</h2>
                     <Togglable buttonLabel='log in'>
                         <LoginForm
@@ -157,9 +140,7 @@ class App extends React.Component {
         return (
             <div className='container'>
                 <h2>blogs</h2>
-                <Notification
-                    message={this.state.message}
-                    cssClass={this.state.cssClass}/>
+                <Notification/>
                 <form onSubmit={this.logout}>
                     {this.state.user.name} logged in.
                     <button>logout</button>
@@ -177,15 +158,15 @@ class App extends React.Component {
                 /> <br/>
                 <Table striped>
                     <tbody>
-                {blogsCopy.map(blog =>
-                    <Blog
-                        key={blog._id}
-                        blog={blog}
-                        onBlogLiked={this.onBlogLiked}
-                        onBlogDelete={this.onBlogDelete}
-                        user={this.state.user}
-                    />
-                )}
+                        {blogsCopy.map(blog =>
+                            <Blog
+                                key={blog._id}
+                                blog={blog}
+                                onBlogLiked={this.onBlogLiked}
+                                onBlogDelete={this.onBlogDelete}
+                                user={this.state.user}
+                            />
+                        )}
                     </tbody>
                 </Table>
             </div>
@@ -193,4 +174,6 @@ class App extends React.Component {
     }
 }
 
-export default App
+const ConnectedApp = connect(null, { showNotification })(App)
+
+export default ConnectedApp

@@ -10,16 +10,16 @@ describe.only('<Blog />', () => {
             url: 'www.kitcarlson',
             likes: 3
         }
-        
+
         const blogComponent = shallow(<Blog blog={blog}/>)
-        
+
         const headerDiv = blogComponent.find('.blogStyle')
         const notFoundDiv = blogComponent.find('.blogInnerStyle')
         expect(notFoundDiv.getElement().props.style).toEqual({ display: 'none' })
-        
+
         headerDiv.simulate('click')
         const innerDiv = blogComponent.find('.blogInnerStyle')
-        expect(innerDiv.getElement().props.style).toEqual({ display: ''})
-        
+        expect(innerDiv.getElement().props.style).toEqual({ display: '' })
+
     })
 })
