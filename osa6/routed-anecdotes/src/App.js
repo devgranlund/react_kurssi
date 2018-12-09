@@ -1,5 +1,6 @@
 import React from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
+import { ListGroup, ListGroupItem } from 'react-bootstrap'
 
 const menuStyle = {
     backgroundColor: '#4EDBFE',
@@ -38,7 +39,7 @@ const notificationStyle = {
     color: 'green',
     borderColor: 'green',
     fontColor: 'green',
-    borderRadius: '3ßpx',
+    borderRadius: '3px',
     borderWidth: '1px',
     borderStyle: 'solid'
 }
@@ -49,12 +50,12 @@ const AnecdoteList = ({ anecdotes, notification }) => (
             {notification}
         </div>
         <h2>Anecdotes</h2>
-        <ul>
+        <ListGroup>
             {anecdotes.map(anecdote =>
-                <li key={anecdote.id} >
+                <ListGroupItem key={anecdote.id} >
                     <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
-                </li>)}
-        </ul>
+                </ListGroupItem>)}
+        </ListGroup>
     </div>
 )
 
@@ -195,7 +196,7 @@ class App extends React.Component {
 
   render() {
       return (
-          <div>
+          <div className='container'>
               <h1>Software anecdotes</h1>
               <Menu state={this.state}
                   addNew={this.addNew}
