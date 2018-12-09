@@ -1,11 +1,18 @@
 import React from 'react'
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
 
+const menuStyle = {
+    backgroundColor: '#4EDBFE',
+    padding: '10px',
+    fontSize: '20px',
+    fontWeight: 'bold'
+}
+
 const Menu = ({ state, addNew, anecdoteById, addNotification }) => (
     <div>
         <Router>
             <div>
-                <div>
+                <div style={menuStyle}>
                     <Link to='/'>anecdotes</Link>&nbsp;
                     <Link to='/create'>create new</Link>&nbsp;
                     <Link to='/about'>about</Link>&nbsp;
