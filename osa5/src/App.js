@@ -1,7 +1,6 @@
 import React from 'react'
 import Blog from './components/Blog'
 import blogService from './services/blogs'
-import loginService from './services/login'
 import Notification from './components/Notification'
 import NewBlogForm from './components/NewBlogForm'
 import LoginForm from './components/LoginForm'
@@ -9,29 +8,27 @@ import Togglable from './components/Togglable'
 import { Table } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import { showNotification } from './reducers/notificationReducer'
+import { login , setUser } from './reducers/userReducer'
 
 
 class App extends React.Component {
     onFieldChange = (event) => {
         this.setState({ [event.target.name]: event.target.value })
     }
-    login = async (event) => {
-        event.preventDefault()
-        try {
-            const user = await loginService.login({
-                username: this.state.username,
-                password: this.state.password
-            })
-
-            this.setState({ username: '', password: '', user })
-            window.localStorage.setItem('authorizedUser', JSON.stringify(user))
-        } catch (exception) {
-            this.props.showNotification('käyttäjätunnus tai salasana virheellinen',
-                'error', false)
-        }
+    login = (username, password) => {
+        console.log('login')
+        this.props.login(username, password)
+            .then(function(result) {
+                    window.localStorage.setItem('authorizedUser', JSON.stringify(result))
+                    window.location.reload()
+                }, result => this.onLoginError()
+            )
     }
     logout = (event) => {
         window.localStorage.removeItem('authorizedUser')
+    }
+    onLoginError = () => {
+        this.props.showNotification('käyttäjätunnus tai salasana virheellinen', 'error', false)
     }
     onCreateNewBlog = async (event) => {
         event.preventDefault()
@@ -40,7 +37,7 @@ class App extends React.Component {
                 title: this.state.blogTitle,
                 author: this.state.blogAuthor,
                 url: this.state.blogUrl
-            }, this.state.user.token)
+            }, this.props.user.token)
             this.setState({ blogTitle:'', blogAuthor:'', blogUrl:'' })
             this.props.showNotification(
                 'a new blog ' + blog.title + ' by ' + blog.author + ' added',
@@ -61,7 +58,7 @@ class App extends React.Component {
                 title: blog.title,
                 url: blog.url
             }
-            const response = await blogService.updateBlog(updatedBlog, this.state.user.token)
+            const response = await blogService.updateBlog(updatedBlog, this.props.user.token)
             this.props.showNotification(
                 'blog ' + blog.title + ' by ' + blog.author + ' liked',
                 'success', false)
@@ -73,7 +70,7 @@ class App extends React.Component {
     onBlogDelete = async (blog) => {
         try {
             if (window.confirm('delete ' + blog.title + ' by ' + blog.author)) {
-                const response = await blogService.deleteBlog(blog, this.state.user.token)
+                const response = await blogService.deleteBlog(blog, this.props.user.token)
                 console.log(response)
                 this.props.showNotification(
                     'blog deleted',
@@ -89,9 +86,6 @@ class App extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-            username: '',
-            password: '',
-            user: null,
             blogs: [],
             blogTitle: '',
             blogAuthor: '',
@@ -106,9 +100,9 @@ class App extends React.Component {
         )
 
         const authorizedUser = window.localStorage.getItem('authorizedUser')
-        if (authorizedUser) {
+        if (authorizedUser !== null && authorizedUser !== 'null') {
             const user = JSON.parse(authorizedUser)
-            this.setState({ user })
+            this.props.setUser(user)
         }
     }
 
@@ -119,7 +113,7 @@ class App extends React.Component {
             return b.likes - a.likes
         })
 
-        if (this.state.user === null) {
+        if (this.props.user === null) {
 
             return (
                 <div className='container'>
@@ -128,9 +122,6 @@ class App extends React.Component {
                     <Togglable buttonLabel='log in'>
                         <LoginForm
                             handleSubmit={this.login}
-                            username={this.state.username}
-                            password={this.state.password}
-                            onFieldChange={this.onFieldChange}
                         />
                     </Togglable>
                 </div>
@@ -142,7 +133,7 @@ class App extends React.Component {
                 <h2>blogs</h2>
                 <Notification/>
                 <form onSubmit={this.logout}>
-                    {this.state.user.name} logged in.
+                    {this.props.user.name} logged in.
                     <button>logout</button>
                 </form>
                 <br/>
@@ -164,7 +155,7 @@ class App extends React.Component {
                                 blog={blog}
                                 onBlogLiked={this.onBlogLiked}
                                 onBlogDelete={this.onBlogDelete}
-                                user={this.state.user}
+                                user={this.props.user}
                             />
                         )}
                     </tbody>
@@ -174,6 +165,12 @@ class App extends React.Component {
     }
 }
 
-const ConnectedApp = connect(null, { showNotification })(App)
+const mapStateToProps = (store) => {
+    return {
+        user: store.user.user,
+    }
+}
+
+const ConnectedApp = connect(mapStateToProps, { showNotification, login, setUser })(App)
 
 export default ConnectedApp

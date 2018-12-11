@@ -4,10 +4,8 @@ const initialState = {
 }
 
 const notificationReducer = (store = initialState, action) => {
-    console.log(action)
     switch (action.type) {
     case 'SHOW_NOTIFICATION':
-        console.log(store)
         return action
     case 'CLEAR_NOTIFICATION':
         return ''
@@ -17,7 +15,6 @@ const notificationReducer = (store = initialState, action) => {
 }
 
 export const showNotification = (message, cssClass, reload) => {
-    console.log(message)
     return async (dispatch) => {
         dispatch({
             type: 'SHOW_NOTIFICATION',
