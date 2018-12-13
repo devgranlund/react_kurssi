@@ -4,7 +4,8 @@ import Notification from './components/Notification'
 import NewBlogForm from './components/NewBlogForm'
 import LoginForm from './components/LoginForm'
 import Togglable from './components/Togglable'
-import { Table } from 'react-bootstrap'
+import { Table, Button } from 'react-bootstrap'
+import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { showNotification } from './reducers/notificationReducer'
 import { login, setUser } from './reducers/userReducer'
@@ -85,6 +86,31 @@ class App extends React.Component {
              console.error('not authorized')
         }
     }
+    
+    menu() {
+        return (
+            <div>
+                <Router>
+                <div>
+                    <div>
+                        <Link to='/'>blogs</Link> &nbsp;
+                        <Link to='/users'>users</Link> &nbsp;
+                        {this.props.user
+                            ? <em>{this.props.user.name} logged in <form onSubmit={this.logout}> <Button bsStyle='warning' type='submit'>logout</Button></form></em>
+                            : <Link to="/login">login</Link>
+                        }
+                    </div>
+                    
+                    <Route path="/login" render={() => 
+                        this.props.user
+                        ? <Redirect to = '/' />
+                        : <LoginForm handleSubmit={this.login}/>} 
+                    />
+                </div>    
+                </Router>
+            </div>
+        )
+    }
 
     render() {
         const { user, user_loading, user_loading_error, blogs, blogs_loading } = this.props
@@ -109,11 +135,7 @@ class App extends React.Component {
                 <div className='container'>
                     <Notification/>
                     <h2>Log in to application</h2>
-                    <Togglable buttonLabel='log in'>
-                        <LoginForm
-                            handleSubmit={this.login}
-                        />
-                    </Togglable>
+                    {this.menu()}
                 </div>
             )
         }
@@ -130,11 +152,9 @@ class App extends React.Component {
         return (
             <div className='container'>
                 <h2>blogs</h2>
+                {this.menu()}
                 <Notification/>
-                <form onSubmit={this.logout}>
-                    {user.name} logged in.
-                    <button>logout</button>
-                </form>
+                
                 <br/>
                 <h3>create new</h3>
                 <NewBlogForm
