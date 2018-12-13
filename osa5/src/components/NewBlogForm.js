@@ -1,42 +1,52 @@
 import React from 'react'
-import PropTypes from 'prop-types'
 import { FormGroup, ControlLabel, Button, FormControl } from 'react-bootstrap'
 
-const NewBlogForm = (props) => {
-    return (
-        <form onSubmit={props.onCreateNewBlog}>
-            <FormGroup>
-                <ControlLabel>title:</ControlLabel>
-                <FormControl
-                    type="text"
-                    name="blogTitle"
-                    value={props.blogTitle}
-                    onChange={props.onBlogTitleChange} /> <br/>
-                <ControlLabel>author:</ControlLabel>
-                <FormControl
-                    type="text"
-                    name="blogAuthor"
-                    value={props.blogAuthor}
-                    onChange={props.onBlogAuthorChange} /> <br/>
-                <ControlLabel>url:</ControlLabel>
-                <FormControl
-                    type="text"
-                    name="blogUrl"
-                    value={props.blogUrl}
-                    onChange={props.onBlogUrlChange} /> <br/>
-                <Button bsStyle='success' type='submit'>create</Button>
-            </FormGroup>
-        </form>
-    )
-}
+class NewBlogForm extends React.Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            blogTitle: '',
+            blogAuthor: '',
+            blogUrl: ''
+        }
+    }
 
-NewBlogForm.propTypes = {
-    blogTitle: PropTypes.string.isRequired,
-    onBlogTitleChange: PropTypes.func.isRequired,
-    blogAuthor: PropTypes.string.isRequired,
-    onBlogAuthorChange: PropTypes.func.isRequired,
-    blogUrl: PropTypes.string.isRequired,
-    onBlogUrlChange: PropTypes.func.isRequired
+    onFieldChange = (event) => {
+        this.setState({ [event.target.name]: event.target.value })
+    }
+
+    handleSubmit = (event) => {
+        event.preventDefault()
+        this.props.onCreateNewBlog(this.state.blogTitle, this.state.blogAuthor, this.state.blogUrl)
+        this.setState({ blogTitle: '', blogAuthor: '', blogUrl: '' })
+    }
+
+    render(){
+        return (
+            <form onSubmit={this.handleSubmit}>
+                <FormGroup>
+                    <ControlLabel>title:</ControlLabel>
+                    <FormControl
+                        type="text"
+                        name="blogTitle"
+                        value={this.state.blogTitle}
+                        onChange={this.onFieldChange} /> <br/>
+                    <ControlLabel>author:</ControlLabel>
+                    <FormControl
+                        type="text"
+                        name="blogAuthor"
+                        value={this.state.blogAuthor}
+                        onChange={this.onFieldChange} /> <br/>
+                    <ControlLabel>url:</ControlLabel>
+                    <FormControl
+                        type="text"
+                        name="blogUrl"
+                        value={this.state.blogUrl}
+                        onChange={this.onFieldChange} /> <br/>
+                    <Button bsStyle='success' type='submit'>create</Button>
+                </FormGroup>
+            </form>
+        )}
 }
 
 export default NewBlogForm

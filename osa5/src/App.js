@@ -1,6 +1,5 @@
 import React from 'react'
 import Blog from './components/Blog'
-import blogService from './services/blogs'
 import Notification from './components/Notification'
 import NewBlogForm from './components/NewBlogForm'
 import LoginForm from './components/LoginForm'
@@ -8,113 +7,104 @@ import Togglable from './components/Togglable'
 import { Table } from 'react-bootstrap'
 import { connect } from 'react-redux'
 import { showNotification } from './reducers/notificationReducer'
-import { login , setUser } from './reducers/userReducer'
-
+import { login, setUser } from './reducers/userReducer'
+import { initBlogs, createBlog, updateBlog, deleteBlog } from './reducers/blogReducer'
 
 class App extends React.Component {
     onFieldChange = (event) => {
         this.setState({ [event.target.name]: event.target.value })
     }
+    
     login = (username, password) => {
-        console.log('login')
         this.props.login(username, password)
-            .then(function(result) {
-                    window.localStorage.setItem('authorizedUser', JSON.stringify(result))
-                    window.location.reload()
-                }, result => this.onLoginError()
-            )
     }
+    
     logout = (event) => {
         window.localStorage.removeItem('authorizedUser')
     }
-    onLoginError = () => {
-        this.props.showNotification('käyttäjätunnus tai salasana virheellinen', 'error', false)
-    }
-    onCreateNewBlog = async (event) => {
-        event.preventDefault()
-        try {
-            const blog = await blogService.createNewBlog({
-                title: this.state.blogTitle,
-                author: this.state.blogAuthor,
-                url: this.state.blogUrl
-            }, this.props.user.token)
-            this.setState({ blogTitle:'', blogAuthor:'', blogUrl:'' })
-            this.props.showNotification(
-                'a new blog ' + blog.title + ' by ' + blog.author + ' added',
-                'success', true)
-        } catch (exception) {
-            this.props.showNotification('error: ' + exception,
-                'error', false)
+    
+    onCreateNewBlog = (blogTitle, blogAuthor, blogUrl) => {
+        const newBlog = {
+            title: blogTitle,
+            author: blogAuthor,
+            url: blogUrl
         }
+        this.props.createBlog(newBlog, this.props.user.token)
+            .then(result => this.props.showNotification(
+                     'a new blog ' + blogTitle + ' by ' + blogAuthor + ' added',
+                     'success', true))
+            .catch(error => this.props.showNotification('error: ' + error,
+                     'error', false))
+        
     }
+    
     onBlogLiked = async (blog) => {
-        try {
-            blog.likes = blog.likes + 1
-            const updatedBlog = {
-                id: blog.id,
-                user: blog.user._id,
-                likes: blog.likes,
-                author: blog.author,
-                title: blog.title,
-                url: blog.url
-            }
-            const response = await blogService.updateBlog(updatedBlog, this.props.user.token)
-            this.props.showNotification(
-                'blog ' + blog.title + ' by ' + blog.author + ' liked',
-                'success', false)
-        } catch (exception) {
-            this.props.showNotification('error: ' + exception,
-                'error', false)
+        blog.likes = blog.likes + 1
+        const updatedBlog = {
+            id: blog.id,
+            user: blog.user,
+            likes: blog.likes,
+            author: blog.author,
+            title: blog.title,
+            url: blog.url
         }
+        this.props.updateBlog(updatedBlog, this.props.user.token)
+            .then(result => this.props.showNotification(
+                'blog ' + updatedBlog.title + ' by ' + updatedBlog.author + ' liked',
+                'success', false))
+            .catch(error => this.props.showNotification('error: ' + error,
+                'error', false))
     }
+    
     onBlogDelete = async (blog) => {
-        try {
-            if (window.confirm('delete ' + blog.title + ' by ' + blog.author)) {
-                const response = await blogService.deleteBlog(blog, this.props.user.token)
-                console.log(response)
-                this.props.showNotification(
+        if (window.confirm('delete ' + blog.title + ' by ' + blog.author)) {
+            this.props.deleteBlog(blog, this.props.user.token)
+                .then(result => this.props.showNotification(
                     'blog deleted',
-                    'success', true)
-            }
-        } catch (exception) {
-            this.props.showNotification('error: ' + exception,
-                'error', false)
+                    'success', true))
+                .catch(error => this.props.showNotification('error: ' + error,
+                    'error', false))
         }
-
     }
 
     constructor(props) {
         super(props)
         this.state = {
-            blogs: [],
-            blogTitle: '',
-            blogAuthor: '',
-            blogUrl: '',
             loginVisible: false
         }
     }
 
     componentDidMount() {
-        blogService.getAll().then(blogs =>
-            this.setState({ blogs })
-        )
+        this.props.initBlogs()
 
         const authorizedUser = window.localStorage.getItem('authorizedUser')
         if (authorizedUser !== null && authorizedUser !== 'null') {
-            const user = JSON.parse(authorizedUser)
-            this.props.setUser(user)
+             const user = JSON.parse(authorizedUser)
+             this.props.setUser(user)
+        } else {
+             console.error('not authorized')
         }
     }
 
     render() {
+        const { user, user_loading, user_loading_error, blogs, blogs_loading } = this.props
+        
+        // Loading
+        if (user_loading || blogs_loading){
+            return (
+                <div className='container'>
+                    <h2>Loading...</h2>
+                </div>
+            )
+        }
+        
+        // Authentication error
+        if (user_loading_error){
+            this.props.showNotification('käyttäjätunnus tai salasana virheellinen', 'error', false)
+        }
 
-        let blogsCopy = this.state.blogs.slice(0)
-        blogsCopy.sort(function(a, b){
-            return b.likes - a.likes
-        })
-
-        if (this.props.user === null) {
-
+        // User not authenticated
+        if (user === null) {
             return (
                 <div className='container'>
                     <Notification/>
@@ -127,25 +117,28 @@ class App extends React.Component {
                 </div>
             )
         }
-        // else
+
+        // Sort blogs
+        let blogsCopy = blogs.slice(0)
+        blogsCopy.sort(function(a, b){
+            return b.likes - a.likes
+        })
+
+        // Save user to local storage in order to survive from refresh
+        window.localStorage.setItem('authorizedUser', JSON.stringify(user))
+        
         return (
             <div className='container'>
                 <h2>blogs</h2>
                 <Notification/>
                 <form onSubmit={this.logout}>
-                    {this.props.user.name} logged in.
+                    {user.name} logged in.
                     <button>logout</button>
                 </form>
                 <br/>
                 <h3>create new</h3>
                 <NewBlogForm
                     onCreateNewBlog={this.onCreateNewBlog}
-                    blogTitle={this.state.blogTitle}
-                    onBlogTitleChange={this.onFieldChange}
-                    blogAuthor={this.state.blogAuthor}
-                    onBlogAuthorChange={this.onFieldChange}
-                    blogUrl={this.state.blogUrl}
-                    onBlogUrlChange={this.onFieldChange}
                 /> <br/>
                 <Table striped>
                     <tbody>
@@ -155,7 +148,7 @@ class App extends React.Component {
                                 blog={blog}
                                 onBlogLiked={this.onBlogLiked}
                                 onBlogDelete={this.onBlogDelete}
-                                user={this.props.user}
+                                user={user}
                             />
                         )}
                     </tbody>
@@ -168,9 +161,15 @@ class App extends React.Component {
 const mapStateToProps = (store) => {
     return {
         user: store.user.user,
+        user_loading: store.user.user_loading,
+        user_loading_error: store.user.user_error,
+        
+        blogs: store.blogs.blogs,
+        blogs_loading: store.blogs.blogs_loading,
+        blogs_loading_error: store.blogs.blogs_error
     }
 }
 
-const ConnectedApp = connect(mapStateToProps, { showNotification, login, setUser })(App)
+const ConnectedApp = connect(mapStateToProps, { showNotification, login, setUser, initBlogs, createBlog, updateBlog, deleteBlog })(App)
 
 export default ConnectedApp
