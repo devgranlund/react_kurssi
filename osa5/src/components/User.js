@@ -5,18 +5,29 @@ class User extends React.Component {
     constructor(props) {
         super(props)
         this.state = {
-
+            user: this.props.user
+        }
+        if (props.user === undefined){
+            const userJson = window.localStorage.getItem('user')
+            if (userJson !== null && userJson !== 'null') {
+                const user = JSON.parse(userJson)
+                this.state = { user: user }
+            }
         }
     }
 
+    componentDidMount() {
+
+    }
+
     render() {
-        console.log(this.props.user)
+        window.localStorage.setItem('user', JSON.stringify(this.state.user))
         return (
             <div>
-                <h3>{this.props.user.name}</h3>
+                <h3>{this.state.user.name}</h3>
                 <h4>Added blogs</h4>
                 <ListGroup>
-                    {this.props.user.blogs.map(blog =>
+                    {this.state.user.blogs.map(blog =>
                         <ListGroupItem key={blog.id}>{blog.title}</ListGroupItem>
                     )}
                 </ListGroup>
