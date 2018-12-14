@@ -3,12 +3,12 @@ import Blog from './components/Blog'
 import Notification from './components/Notification'
 import NewBlogForm from './components/NewBlogForm'
 import LoginForm from './components/LoginForm'
-import Togglable from './components/Togglable'
+import Users from './components/Users'
 import { Table, Button } from 'react-bootstrap'
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
 import { showNotification } from './reducers/notificationReducer'
-import { login, setUser } from './reducers/userReducer'
+import { login, setUser, initUsers } from './reducers/userReducer'
 import { initBlogs, createBlog, updateBlog, deleteBlog } from './reducers/blogReducer'
 
 class App extends React.Component {
@@ -77,6 +77,7 @@ class App extends React.Component {
 
     componentDidMount() {
         this.props.initBlogs()
+        this.props.initUsers()
 
         const authorizedUser = window.localStorage.getItem('authorizedUser')
         if (authorizedUser !== null && authorizedUser !== 'null') {
@@ -101,7 +102,12 @@ class App extends React.Component {
                         }
                     </div>
                     
-                    <Route path="/login" render={() => 
+                    <Route exact path="/users" render={() =>
+                        this.props.user
+                        ? <Users users={this.props.users}/> 
+                        : <Redirect to = '/login' />} 
+                    />
+                    <Route exact path="/login" render={() => 
                         this.props.user
                         ? <Redirect to = '/' />
                         : <LoginForm handleSubmit={this.login}/>} 
@@ -183,6 +189,7 @@ const mapStateToProps = (store) => {
         user: store.user.user,
         user_loading: store.user.user_loading,
         user_loading_error: store.user.user_error,
+        users: store.user.users,
         
         blogs: store.blogs.blogs,
         blogs_loading: store.blogs.blogs_loading,
@@ -190,6 +197,6 @@ const mapStateToProps = (store) => {
     }
 }
 
-const ConnectedApp = connect(mapStateToProps, { showNotification, login, setUser, initBlogs, createBlog, updateBlog, deleteBlog })(App)
+const ConnectedApp = connect(mapStateToProps, { showNotification, login, setUser, initUsers, initBlogs, createBlog, updateBlog, deleteBlog })(App)
 
 export default ConnectedApp
