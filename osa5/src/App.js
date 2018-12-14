@@ -4,6 +4,7 @@ import Notification from './components/Notification'
 import NewBlogForm from './components/NewBlogForm'
 import LoginForm from './components/LoginForm'
 import Users from './components/Users'
+import User from './components/User'
 import { Table, Button } from 'react-bootstrap'
 import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom'
 import { connect } from 'react-redux'
@@ -87,6 +88,14 @@ class App extends React.Component {
              console.error('not authorized')
         }
     }
+
+    userById(id){
+        if (this.props.users !== null && this.props.users.length > 0){
+            return this.props.users.filter(user => user.id === id)[0]
+        } else {
+            console.error('users not lodaded correctly')
+        }
+    }
     
     menu() {
         return (
@@ -106,6 +115,9 @@ class App extends React.Component {
                         this.props.user
                         ? <Users users={this.props.users}/> 
                         : <Redirect to = '/login' />} 
+                    />
+                    <Route exact path="/users/:id" render={({match}) =>
+                        <User user={this.userById(match.params.id)} />}
                     />
                     <Route exact path="/login" render={() => 
                         this.props.user
