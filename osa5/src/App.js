@@ -10,7 +10,7 @@ import { BrowserRouter as Router, Route, Link, Redirect } from 'react-router-dom
 import { connect } from 'react-redux'
 import { showNotification } from './reducers/notificationReducer'
 import { login, setUser, initUsers } from './reducers/userReducer'
-import { initBlogs, createBlog, updateBlog, deleteBlog } from './reducers/blogReducer'
+import { initBlogs, createBlog, updateBlog, deleteBlog, commentBlog } from './reducers/blogReducer'
 
 class App extends React.Component {
     onFieldChange = (event) => {
@@ -40,7 +40,7 @@ class App extends React.Component {
         
     }
     
-    onBlogLiked = async (blog) => {
+    onBlogLiked = (blog) => {
         blog.likes = blog.likes + 1
         const updatedBlog = {
             id: blog.id,
@@ -48,6 +48,7 @@ class App extends React.Component {
             likes: blog.likes,
             author: blog.author,
             title: blog.title,
+            comments: blog.comments,
             url: blog.url
         }
         this.props.updateBlog(updatedBlog, this.props.user.token)
@@ -58,7 +59,7 @@ class App extends React.Component {
                 'error', false))
     }
     
-    onBlogDelete = async (blog) => {
+    onBlogDelete = (blog) => {
         if (window.confirm('delete ' + blog.title + ' by ' + blog.author)) {
             this.props.deleteBlog(blog, this.props.user.token)
                 .then(result => this.props.showNotification(
@@ -68,7 +69,27 @@ class App extends React.Component {
                     'error', false))
         }
     }
-
+    
+    onBlogCommented = (blog, comment) => {
+        console.log('onBlogCommented: ', blog, comment)
+        const comments = [...blog.comments, comment]
+        const commentedBlog = {
+            id: blog.id,
+            user: blog.user,
+            likes: blog.likes,
+            author: blog.author,
+            title: blog.title,
+            comments: comments,
+            url: blog.url
+        }
+        this.props.commentBlog(commentedBlog, this.props.user.token)
+            .then(result => this.props.showNotification(
+                'comment ' + comment + 'added to blog' + commentedBlog.title,
+                'success', false))
+            .catch(error => this.props.showNotification('error: ' + error,
+                'error', false))
+    }
+ 
     constructor(props) {
         super(props)
         this.state = {
@@ -186,6 +207,7 @@ class App extends React.Component {
                                 blog={blog}
                                 onBlogLiked={this.onBlogLiked}
                                 onBlogDelete={this.onBlogDelete}
+                                onBlogCommented={this.onBlogCommented}
                                 user={user}
                             />
                         )}
@@ -209,6 +231,6 @@ const mapStateToProps = (store) => {
     }
 }
 
-const ConnectedApp = connect(mapStateToProps, { showNotification, login, setUser, initUsers, initBlogs, createBlog, updateBlog, deleteBlog })(App)
+const ConnectedApp = connect(mapStateToProps, { showNotification, login, setUser, initUsers, initBlogs, createBlog, updateBlog, deleteBlog, commentBlog })(App)
 
 export default ConnectedApp

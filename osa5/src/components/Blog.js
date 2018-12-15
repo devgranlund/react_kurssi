@@ -1,12 +1,18 @@
 import React from 'react'
+import { FormGroup, Button, FormControl } from 'react-bootstrap'
 
 class Blog extends React.Component {
 
     constructor(props) {
         super(props)
         this.state = {
-            detailsVisible: false
+            detailsVisible: false,
+            comment: ''
         }
+    }
+
+    onFieldChange = (event) => {
+        this.setState({ [event.target.name]: event.target.value })
     }
 
     toggleDetails = () => {
@@ -29,6 +35,11 @@ class Blog extends React.Component {
         this.props.onBlogDelete(blog)
     }
 
+    handleSubmit = (event) => {
+        event.preventDefault()
+        this.props.onBlogCommented(this.props.blog, this.state.comment)
+    }
+
     renderDeleteButton = () => {
         if (this.props.user === null){
             return ''
@@ -49,7 +60,22 @@ class Blog extends React.Component {
                         {this.props.blog.url} <br/>
                         {this.props.blog.likes} likes <button onClick={() => this.handleLikeClick(this.props.blog)}>like</button> <br/>
                     added by {this.safeGetUsersName()} <br/>
-                        {this.renderDeleteButton()}
+                        {this.renderDeleteButton()} <br/>
+                        <h5>comments</h5>
+                        <ul>{this.props.blog.comments.map(comment =>
+                            <li key={comment}>{comment}</li>)
+                        }
+                        </ul>
+                        <form onSubmit={this.handleSubmit}>
+                            <FormGroup>
+                                <FormControl
+                                    type="text"
+                                    name="comment"
+                                    value={this.state.comment}
+                                    onChange={this.onFieldChange}/><br/>
+                                <Button bsStyle='success' type='submit'>add comment</Button>
+                            </FormGroup>
+                        </form>
                     </div>
                 </td>
             </tr>

@@ -25,6 +25,9 @@ const blogReducer = (store = initialState, action) => {
     case 'UPDATE_BLOG':
         action.blogs = store.blogs.map(blog => blog.id !== action.blog.id ? blog : action.blog)
         return action
+    case 'COMMENT_BLOG':
+        action.blogs = store.blogs.map(blog => blog.id !== action.blog.id ? blog : action.blog)
+        return action
     default:
         return store
     }
@@ -115,6 +118,30 @@ export const deleteBlog = (blogObject, userToken) => {
                     blogs_loading: false,
                     blog: blogObject
                 }))
+            .catch(error => {
+                dispatch({
+                    type: 'LOAD_BLOGS_FAILURE',
+                    blogs_loading: false,
+                    blogs_error: error
+                })
+                throw new Error(error)
+            })
+    }
+}
+
+export const commentBlog = (blogObject, userToken) => {
+    return async (dispatch) => {
+        dispatch(
+            { type: 'LOAD_BLOGS_BEGIN',
+                blogs_loading: true })
+        await blogService.commentBlog(blogObject, userToken)
+            .then(
+                dispatch({
+                    type: 'COMMENT_BLOG',
+                    blogs_loading: false,
+                    blog: blogObject
+                })
+            )
             .catch(error => {
                 dispatch({
                     type: 'LOAD_BLOGS_FAILURE',
